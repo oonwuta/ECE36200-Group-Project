@@ -1,15 +1,4 @@
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include "pico/stdlib.h"
-#include "hardware/pwm.h"
-
-//support.h from lab 5
-#define N 1000 // Size of the wavetable
-short int wavetable[N];
-#define RATE 20000
-#define M_PI 3.14
+#include "audio.h"
 
 //support.c from lab 5
 int step0 = 0;

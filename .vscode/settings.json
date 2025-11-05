@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "music.h": "c",
+        "stdlib.h": "c",
+        "math.h": "c",
+        "audio.h": "c"
+    }
+}
