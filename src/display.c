@@ -9,7 +9,7 @@ const int SPI_LED_TX = -1; //replace with the TX pin number for the LED display
 
 
 //temporarily here until I know which pins to use
-const int PIN_R1 = 9;       //These next few are self explanatory
+/*const int PIN_R1 = 9;       //These next few are self explanatory
 const int PIN_G1 = 21;
 const int PIN_B1 = 10;
 const int PIN_R2 = 11; 
@@ -284,4 +284,4 @@ void menu_render_and_swap(void) {
     //maybe add small selector arrow on left
 
     new_frame_ready = true;  //signal refresh core to swap buffers
-}
+}*/
