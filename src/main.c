@@ -15,7 +15,7 @@
 int main()
 {
     stdio_init_all(); 
-    play_song(120 ,canon_in_d,0);
+    //play_song(120 ,canon_in_d,0);
     for(;;);
     return 0;
 }

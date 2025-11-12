@@ -1,20 +1,27 @@
-#include "pico/stdlib.h"
-#include "hardware/spi.h"
-#include "pico/multicore.h"
-#include <string.h>
-#include <stdbool.h>
+
+#include <display.h>
 
 //pin constants
 const int SPI_LED_SCK = -1; //replace with the SCK pin number for the LED display
 const int SPI_LED_CSn = -1; //replace with the CSn pin number for the LED display
 const int SPI_LED_TX = -1; //replace with the TX pin number for the LED display
 
+
+
 //temporarily here until I know which pins to use
-const int PIN_OE = -1;      //output enable of panel (active low)
-const int PIN_A  = -1;      //row address bit A
-const int PIN_B  = -1;      //row address bit B
-const int PIN_C  = -1;      //row address bit C
-const int PIN_D  = -1;      //row address bit D 
+const int PIN_R1 = 9;       //These next few are self explanatory
+const int PIN_G1 = 21;
+const int PIN_B1 = 10;
+const int PIN_R2 = 11; 
+const int PIN_G2 = 20;
+const int PIN_B2 = 12;      
+const int PIN_LRT = 17;     //latch pin
+const int PIN_CLK = 15;     //clock pin
+const int PIN_OE = 16;      //output enable of panel (active low)
+const int PIN_A  = 13;      //row address bit A
+const int PIN_B  = 19;      //row address bit B
+const int PIN_C  = 14;      //row address bit C
+const int PIN_D  = 18;      //row address bit D 
 
 //framebuffers (double buffering for pixel display)
 //32x32 pixels for LED Display, each pixel stores 3-bit color: bit2=R, bit1=G, bit0=B
