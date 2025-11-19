@@ -4,7 +4,6 @@
 #include "hardware/timer.h"
 #include "hardware/irq.h"
 #include "music.h"
-#include "led_matrix.h"
 #include "joystick.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -14,14 +13,96 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-int main()
-{
-    stdio_init_all(); 
-    //play_song(120 ,canon_in_d,0);
-    matrix_test();
-    for(;;);
+#include <stdio.h>
+#include <string.h>
+#include "pico/stdlib.h"
+#include "hub75.h"
+
+int main() {
+    stdio_init_all();
+    sleep_ms(2000); // Wait for USB serial to stabilize
+    
+    printf("Starting HUB75 test...\n");
+
+    // Initialize the HUB75 driver
+    hub75_init();
+    printf("HUB75 initialized\n");
+
+    // Test 1: Simple single pixel test
+    printf("Test 1: Single green pixel at (0,0)\n");
+    hub75_clear_backbuffer();
+    hub75_draw_pixel(0, 0, 0, 1, 0);  // Top-left corner green
+    hub75_swap_buffers(false);
+    sleep_ms(2000);
+
+    // Test 2: Four corner pixels
+    printf("Test 2: Four corner pixels (red)\n");
+    hub75_clear_backbuffer();
+    hub75_draw_pixel(0, 0, 1, 0, 0);              // Top-left red
+    hub75_draw_pixel(31, 0, 1, 0, 0);             // Top-right red
+    hub75_draw_pixel(0, 31, 1, 0, 0);             // Bottom-left red
+    hub75_draw_pixel(31, 31, 1, 0, 0);            // Bottom-right red
+    hub75_swap_buffers(false);
+    sleep_ms(2000);
+
+    // Test 3: Full screen red
+    printf("Test 3: Full screen red\n");
+    hub75_clear_backbuffer();
+    for (int y = 0; y < HUB75_HEIGHT; y++) {
+        for (int x = 0; x < HUB75_WIDTH; x++) {
+            hub75_draw_pixel(x, y, 1, 0, 0);
+        }
+    }
+    hub75_swap_buffers(false);
+    sleep_ms(2000);
+
+    // Test 4: Full screen green
+    printf("Test 4: Full screen green\n");
+    hub75_clear_backbuffer();
+    for (int y = 0; y < HUB75_HEIGHT; y++) {
+        for (int x = 0; x < HUB75_WIDTH; x++) {
+            hub75_draw_pixel(x, y, 0, 1, 0);
+        }
+    }
+    hub75_swap_buffers(false);
+    sleep_ms(2000);
+
+    // Test 5: Full screen blue
+    printf("Test 5: Full screen blue\n");
+    hub75_clear_backbuffer();
+    for (int y = 0; y < HUB75_HEIGHT; y++) {
+        for (int x = 0; x < HUB75_WIDTH; x++) {
+            hub75_draw_pixel(x, y, 0, 0, 1);
+        }
+    }
+    hub75_swap_buffers(false);
+    sleep_ms(2000);
+
+    // Test 6: White (all colors)
+    printf("Test 6: Full screen white\n");
+    hub75_clear_backbuffer();
+    for (int y = 0; y < HUB75_HEIGHT; y++) {
+        for (int x = 0; x < HUB75_WIDTH; x++) {
+            hub75_draw_pixel(x, y, 1, 1, 1);
+        }
+    }
+    hub75_swap_buffers(false);
+    
+    printf("Test complete. Display should be white now.\n");
+    printf("Entering continuous refresh loop...\n");
+    
+    hub75_swap_buffers(false);
+    // Continuous refresh loop - keep the display alive
+    while (true) {
+        // Continuously refresh all rows
+        hub75_swap_buffers(false);
+        sleep_us(200); 
+    }
+
     return 0;
 }
+
+
 
 /*
 int main()
