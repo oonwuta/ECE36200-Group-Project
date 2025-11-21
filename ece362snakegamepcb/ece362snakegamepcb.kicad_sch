@@ -7380,6 +7380,131 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "power:+9V"
+			(power)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "+9V"
+				(at 0 3.556 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"+9V\""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "+9V_0_1"
+				(polyline
+					(pts
+						(xy -0.762 1.27) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "+9V_1_1"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:GND"
 			(power)
 			(pin_names
@@ -8030,6 +8155,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "363b6fbe-5f44-44eb-a3ce-4b9a3b22b228")
+	)
+	(junction
+		(at 49.53 358.14)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "3c49f09f-5edc-4113-ad68-44cc7186d7c2")
 	)
 	(junction
 		(at 31.75 336.55)
@@ -9113,7 +9244,7 @@
 	)
 	(wire
 		(pts
-			(xy 41.91 358.14) (xy 50.8 358.14)
+			(xy 41.91 358.14) (xy 49.53 358.14)
 		)
 		(stroke
 			(width 0)
@@ -9760,6 +9891,16 @@
 			(type default)
 		)
 		(uuid "65de782a-117b-42d6-a554-a45e3c92bc74")
+	)
+	(wire
+		(pts
+			(xy 49.53 358.14) (xy 50.8 358.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "65fe736f-816c-4773-b7ad-8d7303f04ce4")
 	)
 	(wire
 		(pts
@@ -15618,6 +15759,72 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+9V")
+		(at 49.53 358.14 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "064f2109-119c-42de-b193-1444b281df8f")
+		(property "Reference" "#PWR060"
+			(at 49.53 361.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+9V"
+			(at 49.53 353.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 49.53 358.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 49.53 358.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+9V\""
+			(at 49.53 358.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2cff508f-93e3-4ac4-871e-ed9d26bd75ad")
+		)
+		(instances
+			(project ""
+				(path "/94683f5c-9cd9-448e-be96-9792537b5cb8"
+					(reference "#PWR060")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Amplifier_Audio:LM386")
 		(at 384.81 349.25 0)
 		(unit 1)
@@ -17425,7 +17632,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Connector:Tag-Connect_TC2030-IDC-FP_2x03_P1.27mm_Vertical"
+		(property "Footprint" "Connector:Tag-Connect_TC2030-IDC-NL_2x03_P1.27mm_Vertical"
 			(at 60.96 67.31 0)
 			(effects
 				(font
@@ -17769,7 +17976,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "Capacitor_THT:C_Radial_D6.3mm_H5.0mm_P2.50mm"
 			(at 398.78 350.2152 0)
 			(effects
 				(font
@@ -18167,7 +18374,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+3.3V"
+		(property "Value" "+3V3"
 			(at 143.51 308.61 0)
 			(effects
 				(font
@@ -18958,7 +19165,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+3.3V"
+		(property "Value" "+3V3"
 			(at 219.71 369.57 0)
 			(effects
 				(font
@@ -20063,7 +20270,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+3.3V"
+		(property "Value" "+3V3"
 			(at 156.21 372.11 0)
 			(effects
 				(font
@@ -21049,7 +21256,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+3.3V"
+		(property "Value" "+3V3"
 			(at 161.29 308.61 0)
 			(effects
 				(font
