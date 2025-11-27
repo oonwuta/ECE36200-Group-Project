@@ -6,3 +6,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+
+void joystick_init();
+void init_dma();
+void joystick_read(uint32_t* x_out, uint32_t* y_out);

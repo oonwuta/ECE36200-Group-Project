@@ -4,6 +4,12 @@
         "stdlib.h": "c",
         "math.h": "c",
         "audio.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "string.h": "c",
+        "multicore.h": "c",
+        "spi.h": "c",
+        "pio.h": "c",
+        "dma.h": "c",
+        "stdbool.h": "c"
     }
 }
