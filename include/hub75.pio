@@ -1,7 +1,0 @@
-.program hub75
-.side_set 1
-
-.wrap_target
-    out pins, 6   side 0   ; output RGB data to R1..B2 (clock low)
-    nop           side 1   ; pulse clock high
-.wrap
