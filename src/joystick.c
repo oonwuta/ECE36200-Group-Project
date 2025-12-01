@@ -22,6 +22,15 @@ fifo and write to the xpos variable. The point is to run joystick init and then 
 joystick read so that xpos and ypos are continously changing and updated with the value from the DMA,
 */
 
+void init_dma() {
+    dma_hw->ch[0].read_addr = (uint32_t)&(adc_hw->fifo);
+    dma_hw->ch[0].write_addr = (uint32_t)(buffer);
+    dma_hw->ch[0].transfer_count = 0x2 | (0x1 <<28); // effectively infinite
+    dma_hw->ch[0].ctrl_trig = 0;
+    uint32_t temp = (0x1 << 2) | (0x1 << 6) |(DREQ_ADC << 17)| (2 << 12) |(0x2 << 8)| DMA_CH0_CTRL_TRIG_EN_BITS; //need to check these
+    dma_hw->ch[0].ctrl_trig = temp;
+    
+}
 
 void joystick_init() {
     // Initialize ADC hardware
@@ -37,17 +46,7 @@ void joystick_init() {
     init_dma();
 }
 
-void init_dma() {
-    dma_hw->ch[0].read_addr = (uint32_t)&(adc_hw->fifo);
-    dma_hw->ch[0].write_addr = (uint32_t)(buffer);
-    dma_hw->ch[0].transfer_count = 0x2 | (0x1 <<28); // effectively infinite
-    dma_hw->ch[0].ctrl_trig = 0;
-    uint32_t temp = (0x1 << 2) | (0x1 << 6) |(DREQ_ADC << 17)| (2 << 12) |(0x2 << 8)| DMA_CH0_CTRL_TRIG_EN_BITS; //need to check these
-    dma_hw->ch[0].ctrl_trig = temp;
-    
-}
-
-void joystick_read(uint32_t* x_out, uint32_t* y_out) {
+void joystick_read(uint16_t* x_out, uint16_t* y_out) {
     // Read X axis
     *x_out = buffer[0];
     *y_out = buffer[1];

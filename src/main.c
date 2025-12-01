@@ -64,7 +64,7 @@ int main() {
     return 0;
 }
 
-/*
+
 int main()
 {
     joystick_init();
@@ -72,16 +72,17 @@ int main()
     uint16_t y = 0;
     bool button_pressed = false;
     int screen_state = 0; //0 is start screen, 1 is game, 2 is high score
-    matrix_init();
+    display_init();
     init_pwm_audio();
     highscores_init_defaults(); //not yet included
+    display_clear();
     snake *head;
     bool dead = false;
     while(1){
         joystick_read(&x, &y);
         int xdir = x > x_thresh ? 1 : (x < -x_thresh ? -1 : 0); 
         int ydir = y > y_thresh ? 1 : (y < -y_thresh ? -1 : 0);
-        button_read(button_pressed);
+        button_read(button_pressed); //imagine that this function exists
         uint8_t startgame = 0; //0 not started, 1 just started, 2 in progress, 3 dead | I should actually make a new state but im lazy
         if(screen_state == 0)
         {
@@ -131,7 +132,7 @@ int main()
         wait_ms(50); //propagate or something
     }
 }
-
+/*
 
 psuedocode draft for main is 
 main: //kind of a state machine

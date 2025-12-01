@@ -11,6 +11,8 @@ typedef struct _snake{
     // Your display state variables here
 } snake;
 
+uint32_t death_screen_display(int x, int y); 
+snake *init_snake_game(void);
 int start_display(int y);
 bool game_loop(int xdir, int ydir, snake *head);
 void highscore_display(void);

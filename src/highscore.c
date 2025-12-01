@@ -139,6 +139,7 @@ int save_highscores(const uint32_t scores[HS_COUNT]) {
 }
 
 //insert a new score into the top list (descending order, saves back to EEPROM)
+
 int highscores_insert_and_save(uint32_t new_score) {
     uint32_t scores[HS_COUNT];
     //load existing
@@ -181,6 +182,7 @@ int highscores_insert_and_save(uint32_t new_score) {
 }
 
 //clears highscores and writes default zeros and magic
+
 int highscores_init_defaults() {
     uint32_t zeros[HS_COUNT];
     for(int i = 0; i < HS_COUNT; i++) 
@@ -201,6 +203,7 @@ int highscores_init_defaults() {
 }
 
 //test init
+
 int highscores_ensure_initialized() {
     uint32_t magic = 0;
     if(eeprom_read_magic(&magic) < 0) 

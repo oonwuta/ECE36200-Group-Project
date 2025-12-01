@@ -1,5 +1,6 @@
 
 #include <display.h>
+#include <stdlib.h>
 #include "hub75.h"
 #include <string.h>
 #include <stdlib.h>
@@ -8,6 +9,7 @@
 #include "hardware/dma.h"
 #include "hardware/irq.h"
 #include "hardware/clocks.h"
+#include "highscore.h"
 
 uint8_t cursor = 0;
 uint8_t ycursor = 0;
@@ -349,6 +351,7 @@ bool game_loop(int xdir, int ydir, snake *head)
 //We are going to require external instructions including one to tlell the user to press any button to get out of highcore state due to not being able to display everything
 void highscore_display(void)
 {
+    //this isnt used but
     int buff[32][32] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //1
                         {0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0}, //2
                         {0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0}, //3
@@ -381,7 +384,19 @@ void highscore_display(void)
                         {0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //30
                         {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //31
                         {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}; //32
-    uint32_t scores[5] = malloc(5 * sizeof(uint32_t));
+    for(int i = 0; i < 32; i++)
+    {
+        for(int j = 0; j < 32; j++)
+        {
+            if(buff[i][j] == 1)
+            {
+                display_set_pixel(j, i, 255, 255, 255); //white pixel
+            }
+        }
+    }
+    
+    uint32_t *scores;
+    scores = malloc(5 * sizeof(uint32_t));
     int check = load_highscores(scores); //should have the upper 15 bits store the name and the lower 17-10 bits store the actual score _____
     while(check == -1)
     {
@@ -422,7 +437,7 @@ void highscore_display(void)
 
 }
 
-void death_screen_display(int x, int y) 
+uint32_t death_screen_display(int x, int y) 
 //i can either pass in the score or keep it as a global variable in this function 
 //I dont know if every score is being updated to the EEprom but if not then I can pull the 
 //top 5 scores, sort, and compare it with all of them which would not take much time
@@ -589,7 +604,7 @@ void death_screen_display(int x, int y)
         }
     }
 
-    return char1 << 31 | char2 << 26 || char3 << 21 || ((uint32_t) score);
+    return (char1 << 31) | (char2 << 26) || (char3 << 21) || ((uint32_t) score);
 }
 
 //pin constants

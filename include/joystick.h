@@ -9,4 +9,4 @@
 
 void joystick_init();
 void init_dma();
-void joystick_read(uint32_t* x_out, uint32_t* y_out);
+void joystick_read(uint16_t* x_out, uint16_t* y_out);
