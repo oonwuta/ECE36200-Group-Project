@@ -122,7 +122,7 @@ int start_display(int y) //used huge aray to make display readable, is also poss
         }
         display_refresh();
 
-        wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
+        //wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 2; i <= 24; i++)
         {
             display_set_pixel(15, i, 0, 0, 0); //draw red line next to Start Game
@@ -146,7 +146,7 @@ int start_display(int y) //used huge aray to make display readable, is also poss
         }
 
         display_refresh();
-        wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
+        //wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 2; i <= 24; i++)
         {
             display_set_pixel(23, i, 0, 0, 0); //draw red line next to High Scores

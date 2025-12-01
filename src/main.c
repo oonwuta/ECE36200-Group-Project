@@ -7,6 +7,7 @@
 #include "music.h"
 #include "joystick.h"
 #include "display.h"
+#include "highscore.h"
 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -64,7 +65,7 @@ int main() {
     return 0;
 }
 
-
+/*
 int main()
 {
     joystick_init();
@@ -82,7 +83,7 @@ int main()
         joystick_read(&x, &y);
         int xdir = x > x_thresh ? 1 : (x < -x_thresh ? -1 : 0); 
         int ydir = y > y_thresh ? 1 : (y < -y_thresh ? -1 : 0);
-        button_read(button_pressed); //imagine that this function exists
+        button_pressed = button_read(); //imagine that this function exists
         uint8_t startgame = 0; //0 not started, 1 just started, 2 in progress, 3 dead | I should actually make a new state but im lazy
         if(screen_state == 0)
         {
@@ -114,7 +115,7 @@ int main()
                 if(button_pressed)
                 {
                     //compare highscore in here and then store here if highscore is to be determined here
-                    hub75_clear_backbuffer();
+                    display_clear();
                     screen_state = 2;
                 }
             }
@@ -125,13 +126,13 @@ int main()
             //display high scores and wait for button press to go back to start screen
             if(button_pressed)
             {
-                hub75_clear_backbuffer();
+                display_clear();
                 screen_state = 0;
             }
         }
-        wait_ms(50); //propagate or something
+        display_refresh();
     }
-}
+}*/
 /*
 
 psuedocode draft for main is 

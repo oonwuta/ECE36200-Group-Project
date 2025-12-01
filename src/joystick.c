@@ -51,3 +51,7 @@ void joystick_read(uint16_t* x_out, uint16_t* y_out) {
     *x_out = buffer[0];
     *y_out = buffer[1];
 }
+
+bool button_read(){
+    return false;
+}

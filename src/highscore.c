@@ -1,5 +1,6 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
+#include "highscore.h"
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
