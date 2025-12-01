@@ -21,11 +21,11 @@
       "footprints": true,
       "graphics": false,
       "keepouts": false,
-      "lockedItems": false,
+      "lockedItems": true,
       "otherItems": false,
       "pads": false,
       "text": false,
-      "tracks": false,
+      "tracks": true,
       "vias": false,
       "zones": false
     },
@@ -47,7 +47,7 @@
       "drc_warnings",
       "shapes"
     ],
-    "visible_layers": "00000000_00000000_0fffffff_7fffffff",
+    "visible_layers": "ffffffff_ffffffff_ffffffff_f7fffffd",
     "zone_display_mode": 0
   },
   "git": {
@@ -97,6 +97,8 @@
       91,
       91,
       71,
+      91,
+      91,
       91,
       91
     ],

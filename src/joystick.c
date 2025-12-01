@@ -29,8 +29,8 @@ void joystick_init() {
     // Enable the ADC input on the specified GPIO pins
     adc_gpio_init(joystickX);
     adc_gpio_init(joystickY);
-    gpio_init(joystickbutton);
-    gpio_set_dir(joystickbutton, GPIO_IN); //a lot of options for how to handle this either an interrupt can be enabled for the start screen and highscore screen but if button needs to be debounced dma may be better
+    //gpio_init(joystickbutton);
+    //gpio_set_dir(joystickbutton, GPIO_IN); //a lot of options for how to handle this either an interrupt can be enabled for the start screen and highscore screen but if button needs to be debounced dma may be better
     //adc_select_input(joysticYadc); // Select Y axis for initial read
     adc_set_round_robin(1 << joysticXadc | 1 << joysticYadc); //enable round robin on both channels
     adc_run(true);
@@ -51,9 +51,4 @@ void joystick_read(uint32_t* x_out, uint32_t* y_out) {
     // Read X axis
     *x_out = buffer[0];
     *y_out = buffer[1];
-}
-
-void button_read(bool* pressed_out) {
-    // For now, just return false
-    *pressed_out = false;
 }
