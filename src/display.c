@@ -8,7 +8,6 @@
 #include "hardware/dma.h"
 #include "hardware/irq.h"
 #include "hardware/clocks.h"
-#include "hub75.pio.h"
 
 uint8_t cursor = 0;
 uint8_t ycursor = 0;
@@ -101,7 +100,7 @@ int start_display(int y) //used huge aray to make display readable, is also poss
         {
             if(buff[i][j] == 1)
             {
-                hub75_draw_pixel(j, i, 255, 255, 255); //white pixel
+                display_set_pixel(j, i, 1, 1, 1); //white pixel
             }
         }
     }
@@ -111,50 +110,50 @@ int start_display(int y) //used huge aray to make display readable, is also poss
     {
         for(int i = 2; i <= 24; i++)
         {
-            hub75_draw_pixel(15, i, 255, 0, 0); //draw red line next to Start Game
-            hub75_draw_pixel(23,  i, 255, 0, 0);
+            display_set_pixel(15, i, 1, 0, 0); //draw red line next to Start Game
+            display_set_pixel(23,  i, 1, 0, 0);
         }
         for(int i = 15; i <= 23; i++)
         {
-            hub75_draw_pixel(i, 2, 255, 0, 0);
-            hub75_draw_pixel(i, 24, 255, 0, 0);
+            display_set_pixel(i, 2, 1, 0, 0);
+            display_set_pixel(i, 24, 1, 0, 0);
         }
-        hub75_swap_buffers(false);
-        hub75_refresh_display();
+        display_refresh();
+
         wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 2; i <= 24; i++)
         {
-            hub75_draw_pixel(15, i, 0, 0, 0); //draw red line next to Start Game
-            hub75_draw_pixel(23,  i, 0, 0, 0);
+            display_set_pixel(15, i, 0, 0, 0); //draw red line next to Start Game
+            display_set_pixel(23,  i, 0, 0, 0);
         }
         for(int i = 15; i <= 23; i++)
         {
-            hub75_draw_pixel(i, 2, 0, 0, 0);
-            hub75_draw_pixel(i, 24, 0, 0, 0);
+            display_set_pixel(i, 2, 0, 0, 0);
+            display_set_pixel(i, 24, 0, 0, 0);
         }
     } else {
         for(int i = 2; i <= 24; i++)
         {
-            hub75_draw_pixel(23, i, 255, 0, 0); //draw red line next to High Scores
-            hub75_draw_pixel(31,  i, 255, 0, 0);
+            display_set_pixel(23, i, 1, 0, 0); //draw red line next to High Scores
+            display_set_pixel(31,  i, 1, 0, 0);
         }
         for(int i = 23; i <= 31; i++)
         {
-            hub75_draw_pixel(i, 2, 255, 0, 0);
-            hub75_draw_pixel(i, 24, 255, 0, 0);
+            display_set_pixel(i, 2, 1, 0, 0);
+            display_set_pixel(i, 24, 1, 0, 0);
         }
-        hub75_swap_buffers(false); // have no idea whta this is for
-        hub75_refresh_display();
+
+        display_refresh();
         wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 2; i <= 24; i++)
         {
-            hub75_draw_pixel(23, i, 0, 0, 0); //draw red line next to High Scores
-            hub75_draw_pixel(31,  i, 0, 0, 0);
+            display_set_pixel(23, i, 0, 0, 0); //draw red line next to High Scores
+            display_set_pixel(31,  i, 0, 0, 0);
         }
         for(int i = 23; i <= 31; i++)
         {
-            hub75_draw_pixel(i, 2, 0, 0, 0);
-            hub75_draw_pixel(i, 24, 0, 0, 0);
+            display_set_pixel(i, 2, 0, 0, 0);
+            display_set_pixel(i, 24, 0, 0, 0);
         }
     }
     return cursor;
@@ -178,10 +177,10 @@ snake *init_snake_game(void)
     return head;
     for(int i = 0; i < 32; i++)
     {
-        hub75_draw_pixel(0, i, 255, 255, 255); //clear screen
-        hub75_draw_pixel(31, i, 255, 255, 255); //clear screen
-        hub75_draw_pixel(i, 0, 255, 255, 255); //clear screen
-        hub75_draw_pixel(i, 31, 255, 255, 255); //clear screen
+        display_set_pixel(0, i, 1, 1, 1); //clear screen
+        display_set_pixel(31, i, 1, 1, 1); //clear screen
+        display_set_pixel(i, 0, 1, 1, 1); //clear screen
+        display_set_pixel(i, 31, 1, 1, 1); //clear screen
     }
     f_xpos = (rand() % 30 - 1 + 1) + 1; //this number gen not right lol
     f_ypos = (rand() % 30 - 1 + 1) + 1;
@@ -190,7 +189,7 @@ snake *init_snake_game(void)
         f_xpos = 23;
         f_ypos = 23;
     }
-    hub75_draw_pixel(f_xpos, f_ypos, 0, 255, 0); //draw food
+    display_set_pixel(f_xpos, f_ypos, 0, 1, 0); //draw food
 
 }
 
@@ -290,7 +289,7 @@ bool game_loop(int xdir, int ydir, snake *head)
     {
         return true; //player died
     }
-    hub75_draw_pixel(head->xpos, head->ypos, 255, 255, 255); // since not updating to invalid position draw new head
+    display_set_pixel(head->xpos, head->ypos, 1, 1, 1); // since not updating to invalid position draw new head
     //note that we do not need to check if it is colliding with food because the food position is now a snake piece giving the illusion of moving forward
     if(head->xpos == f_xpos && head->ypos == f_ypos) //ate food
     {
@@ -298,12 +297,12 @@ bool game_loop(int xdir, int ydir, snake *head)
         
         f_xpos = (rand() % 31 - 1 + 1) + 1;
         f_ypos = (rand() % 31 - 1 + 1) + 1;
-        hub75_draw_pixel(f_xpos, f_ypos, 0, 255, 0); //draw new food
+        display_set_pixel(f_xpos, f_ypos, 0, 1, 0); //draw new food
     } else {
         //move snake
         if(head->next == NULL)
         {
-            hub75_draw_pixel(prevxpos, prevypos, 0, 0, 0); //clear trail and exit | could be source of visual issues
+            display_set_pixel(prevxpos, prevypos, 0, 0, 0); //clear trail and exit | could be source of visual issues
             return false;
         }
         snake *current = head->next; //take the segment after head snake will look like X _ Y... at this point
@@ -318,7 +317,7 @@ bool game_loop(int xdir, int ydir, snake *head)
         //on the other hand our struct says X1 Y [?]... with prevxpos and prevypos being Y's pos
         if(current->next == NULL)
         {
-            hub75_draw_pixel(prevxpos, prevypos, 0, 0, 0); 
+            display_set_pixel(prevxpos, prevypos, 0, 0, 0); 
             return false;
         }
         current = current->next; //current now points at ? so it looks like X Y _ [?] ... 
@@ -337,7 +336,7 @@ bool game_loop(int xdir, int ydir, snake *head)
             }
             if(current->next == NULL)
             {
-                hub75_draw_pixel(prevxpos, prevypos, 0, 0, 0);
+                display_set_pixel(prevxpos, prevypos, 0, 0, 0);
             }
             current = current->next;
         }
@@ -410,9 +409,9 @@ void highscore_display(void)
                 for(int l = 0; l < 3; l++) //for each column in specified letter/number
                 {
                     if(letters[l_deco[j]][count] == 1) //l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
-                        hub75_draw_pixel(xpos + l, ypos + k, 255, 255, 255); //white pixel
+                        display_set_pixel(xpos + l, ypos + k, 1, 1, 1); //white pixel
                     else
-                        hub75_draw_pixel(xpos + l, ypos + k, 0, 0, 0); //black pixel
+                        display_set_pixel(xpos + l, ypos + k, 0, 0, 0); //black pixel
                     count++;
                 }
             }
@@ -466,7 +465,7 @@ void death_screen_display(int x, int y)
         {
             if(buff[i][j] == 1)
             {
-                hub75_draw_pixel(j, i, 255, 255, 255); //white pixel
+                display_set_pixel(j, i, 1, 1, 1); //white pixel
             }
         }
     }
@@ -482,34 +481,34 @@ void death_screen_display(int x, int y)
                 for(int l = 0; l < 3; l++) //for each column in specified letter/number
                 {
                     if(letters[ycursor][count] == 1) //l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
-                        hub75_draw_pixel(6 + l, 20 + k, 255, 255, 255); //white pixel
+                        display_set_pixel(6 + l, 20 + k, 1, 1, 1); //white pixel
                     else
-                        hub75_draw_pixel(6 + l, 20 + k, 0, 0, 0); //black pixel
+                        display_set_pixel(6 + l, 20 + k, 0, 0, 0); //black pixel
                     count++;
                 }
             }
         for(int i = 5; i <= 9; i++)
         {
-            hub75_draw_pixel(i, 19, 255, 0, 0); //draw red line next to Start Game
-            hub75_draw_pixel(i, 25, 255, 0, 0);
+            display_set_pixel(i, 19, 1, 0, 0); //draw red line next to Start Game
+            display_set_pixel(i, 25, 1, 0, 0);
         }
         for(int i = 19; i <= 25; i++)
         {
-            hub75_draw_pixel(5, i, 255, 0, 0);
-            hub75_draw_pixel(9, i, 255, 0, 0);
+            display_set_pixel(5, i, 1, 0, 0);
+            display_set_pixel(9, i, 1, 0, 0);
         }
-        hub75_swap_buffers(false);
-        hub75_refresh_display();
+       
+        display_refresh();
         wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 5; i <= 9; i++)
         {
-            hub75_draw_pixel(i, 19, 0, 0, 0); //draw red line next to Start Game
-            hub75_draw_pixel(i, 25, 0, 0, 0);
+            display_set_pixel(i, 19, 0, 0, 0); //draw red line next to Start Game
+            display_set_pixel(i, 25, 0, 0, 0);
         }
         for(int i = 19; i <= 25; i++)
         {
-            hub75_draw_pixel(5, i, 0, 0, 0);
-            hub75_draw_pixel(9, i, 0, 0, 0);
+            display_set_pixel(5, i, 0, 0, 0);
+            display_set_pixel(9, i, 0, 0, 0);
         }
     } else if (cursor == 1)
     {
@@ -520,34 +519,34 @@ void death_screen_display(int x, int y)
                 for(int l = 0; l < 3; l++) //for each column in specified letter/number
                 {
                     if(letters[ycursor][count] == 1) //l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
-                        hub75_draw_pixel(12 + l, 20 + k, 255, 255, 255); //white pixel
+                        display_set_pixel(12 + l, 20 + k, 1, 1, 1); //white pixel
                     else
-                        hub75_draw_pixel(12 + l, 20 + k, 0, 0, 0); //black pixel
+                        display_set_pixel(12 + l, 20 + k, 0, 0, 0); //black pixel
                     count++;
                 }
             }
         for(int i = 11; i <= 15; i++)
         {
-            hub75_draw_pixel(i, 19, 255, 0, 0); //draw red line next to Start Game
-            hub75_draw_pixel(i, 25, 255, 0, 0);
+            display_set_pixel(i, 19, 1, 0, 0); //draw red line next to Start Game
+            display_set_pixel(i, 25, 1, 0, 0);
         }
         for(int i = 19; i <= 25; i++)
         {
-            hub75_draw_pixel(15, i, 255, 0, 0);
-            hub75_draw_pixel(11, i, 255, 0, 0);
+            display_set_pixel(15, i, 1, 0, 0);
+            display_set_pixel(11, i, 1, 0, 0);
         }
-        hub75_swap_buffers(false);
-        hub75_refresh_display();
+        
+        display_refresh();
         wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 11; i <= 15; i++)
         {
-            hub75_draw_pixel(i, 19, 0, 0, 0); //draw red line next to Start Game
-            hub75_draw_pixel(i, 25, 0, 0, 0);
+            display_set_pixel(i, 19, 0, 0, 0); //draw red line next to Start Game
+            display_set_pixel(i, 25, 0, 0, 0);
         }
         for(int i = 19; i <= 25; i++)
         {
-            hub75_draw_pixel(15, i, 0, 0, 0);
-            hub75_draw_pixel(11, i, 0, 0, 0);
+            display_set_pixel(15, i, 0, 0, 0);
+            display_set_pixel(11, i, 0, 0, 0);
         }
     }
     else
@@ -559,34 +558,34 @@ void death_screen_display(int x, int y)
                 for(int l = 0; l < 3; l++) //for each column in specified letter/number
                 {
                     if(letters[ycursor][count] == 1) //l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
-                        hub75_draw_pixel(18 + l, 20 + k, 255, 255, 255); //white pixel
+                        display_set_pixel(18 + l, 20 + k, 1, 1, 1); //white pixel
                     else
-                        hub75_draw_pixel(18 + l, 20 + k, 0, 0, 0); //black pixel
+                        display_set_pixel(18 + l, 20 + k, 0, 0, 0); //black pixel
                     count++;
                 }
             }
         for(int i = 17; i <= 21; i++)
         {
-            hub75_draw_pixel(i, 19, 255, 0, 0); //draw red line next to Start Game
-            hub75_draw_pixel(i, 25, 255, 0, 0);
+            display_set_pixel(i, 19, 1, 0, 0); //draw red line next to Start Game
+            display_set_pixel(i, 25, 1, 0, 0);
         }
         for(int i = 19; i <= 25; i++)
         {
-            hub75_draw_pixel(17, i, 255, 0, 0);
-            hub75_draw_pixel(21, i, 255, 0, 0);
+            display_set_pixel(17, i, 1, 0, 0);
+            display_set_pixel(21, i, 1, 0, 0);
         }
-        hub75_swap_buffers(false);
-        hub75_refresh_display();
+        
+        display_refresh();
         wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 17; i <= 21; i++)
         {
-            hub75_draw_pixel(i, 19, 0, 0, 0); //draw red line next to Start Game
-            hub75_draw_pixel(i, 25, 0, 0, 0);
+            display_set_pixel(i, 19, 0, 0, 0); //draw red line next to Start Game
+            display_set_pixel(i, 25, 0, 0, 0);
         }
         for(int i = 19; i <= 25; i++)
         {
-            hub75_draw_pixel(17, i, 0, 0, 0);
-            hub75_draw_pixel(21, i, 0, 0, 0);
+            display_set_pixel(17, i, 0, 0, 0);
+            display_set_pixel(21, i, 0, 0, 0);
         }
     }
 

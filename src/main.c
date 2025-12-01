@@ -37,7 +37,32 @@ double x_thresh = 3.0; //do not currently know what these values will be thresho
 double y_thresh = 3.0;
 
 
+int main() {
+    stdio_init_all();
+    sleep_ms(1000);
+    
+    display_init();
+    
+    int x = 0, y = 0;
+    int dx = 1, dy = 1;
+    
+    for (int i = 0; i < 500; i++) {
+        display_clear();
+        display_pixel_white(x, y);
+        
+        x += dx;
+        y += dy;
+        
+        if (x <= 0 || x >= PANEL_WIDTH - 1) dx = -dx;
+        if (y <= 0 || y >= PANEL_HEIGHT - 1) dy = -dy;
+        
+        for (int j = 0; j < 10; j++) {
+            display_refresh();
+        }
+    }
 
+    return 0;
+}
 
 /*
 int main()
@@ -50,7 +75,6 @@ int main()
     matrix_init();
     init_pwm_audio();
     highscores_init_defaults(); //not yet included
-    hub75_clear_backbuffer();
     snake *head;
     bool dead = false;
     while(1){
@@ -65,7 +89,6 @@ int main()
             if(button_pressed)
             {
                 //some code that accepts x, y and button press to select and returns the next screen state
-                hub75_clear_backbuffer();
                 screen_state = cursor == 0? 1 : 2; //to be changed to the output of that function
                 startgame = 1;
             }
@@ -82,7 +105,7 @@ int main()
             {
                 if(startgame == 2)
                 {
-                    hub75_clear_backbuffer();
+                    
                     kill_snake(head); //free snake memory
                     startgame += 1; //move to dead state
                 }
