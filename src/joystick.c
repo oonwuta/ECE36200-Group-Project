@@ -62,53 +62,42 @@ void joystick_init() {
     adc_gpio_init(joystickX);
     adc_gpio_init(joystickY);
 
-    adc_fifo_setup(true, true, 1, false, false);
     adc_run(true);
-
-    // Setup DMA for X channel
-    adc_select_input(joysticXadc);
-    dma_x_chan = dma_init_channel(x_buffer, DREQ_ADC, joysticXadc);
-    dma_channel_start(dma_x_chan);
-
-    // Setup DMA for Y channel
-    adc_select_input(joysticYadc);
-    dma_y_chan = dma_init_channel(y_buffer, DREQ_ADC, joysticYadc);
-    dma_channel_start(dma_y_chan);
 }
 
-// Read joystick axes, apply oversampling, calibration, and normalization
-void joystick_read(float *x_out, float *y_out) {
-    // Wait for DMA transfer complete (or polling could be used)
-    dma_channel_wait_for_finish_blocking(dma_x_chan);
-    dma_channel_wait_for_finish_blocking(dma_y_chan);
+// // Read joystick axes, apply oversampling, calibration, and normalization
+// void joystick_read(float *x_out, float *y_out) {
+//     // Wait for DMA transfer complete (or polling could be used)
+//     dma_channel_wait_for_finish_blocking(dma_x_chan);
+//     dma_channel_wait_for_finish_blocking(dma_y_chan);
 
-    // Compute averages
-    uint32_t x_sum = 0, y_sum = 0;
-    for (int i = 0; i < OVERSAMPLE; i++) {
-        x_sum += x_buffer[i];
-        y_sum += y_buffer[i];
-    }
-    float x_raw = (x_sum / (float)OVERSAMPLE) * 3.3f / 4095.0f;
-    float y_raw = (y_sum / (float)OVERSAMPLE) * 3.3f / 4095.0f;
+//     // Compute averages
+//     uint32_t x_sum = 0, y_sum = 0;
+//     for (int i = 0; i < OVERSAMPLE; i++) {
+//         x_sum += x_buffer[i];
+//         y_sum += y_buffer[i];
+//     }
+//     float x_raw = (x_sum / (float)OVERSAMPLE) * 3.3f / 4095.0f;
+//     float y_raw = (y_sum / (float)OVERSAMPLE) * 3.3f / 4095.0f;
 
-    // Auto-calibrate min/max
-    if (x_raw < x_min) x_min = x_raw;
-    if (x_raw > x_max) x_max = x_raw;
-    if (y_raw < y_min) y_min = y_raw;
-    if (y_raw > y_max) y_max = y_raw;
+//     // Auto-calibrate min/max
+//     if (x_raw < x_min) x_min = x_raw;
+//     if (x_raw > x_max) x_max = x_raw;
+//     if (y_raw < y_min) y_min = y_raw;
+//     if (y_raw > y_max) y_max = y_raw;
 
-    // Normalize to -1..1
-    float x_norm = 0, y_norm = 0;
-    if ((x_max - x_min) > 0.001f) x_norm = 2.0f * (x_raw - x_min) / (x_max - x_min) - 1.0f;
-    if ((y_max - y_min) > 0.001f) y_norm = 2.0f * (y_raw - y_min) / (y_max - y_min) - 1.0f;
+//     // Normalize to -1..1
+//     float x_norm = 0, y_norm = 0;
+//     if ((x_max - x_min) > 0.001f) x_norm = 2.0f * (x_raw - x_min) / (x_max - x_min) - 1.0f;
+//     if ((y_max - y_min) > 0.001f) y_norm = 2.0f * (y_raw - y_min) / (y_max - y_min) - 1.0f;
 
-    *x_out = x_norm;
-    *y_out = y_norm;
+//     *x_out = x_norm;
+//     *y_out = y_norm;
 
-    // Restart DMA for next batch
-    dma_channel_start(dma_x_chan);
-    dma_channel_start(dma_y_chan);
-}
+//     // Restart DMA for next batch
+//     dma_channel_start(dma_x_chan);
+//     dma_channel_start(dma_y_chan);
+// }
 
 
 
@@ -119,41 +108,50 @@ void button_init(){
 }
 
 
-// void joystick_read(float* x_out, float* y_out) {
-//     // x_min = 0.2f; 
-//     // x_max = 3.1f;
-//     // y_min = 0.2f; 
-//     // y_max = 3.1f;
-//     float x_raw = (buffer[0] * 3.3f) / 4095.0f;
-//     float y_raw = (buffer[1] * 3.3f) / 4095.0f;
+void joystick_read(float* x_out, float* y_out) {
+    // x_min = 0.2f; 
+    // x_max = 3.1f;
+    // y_min = 0.2f; 
+    // y_max = 3.1f;
 
-//     if (!calibrated) {
-//         x_center = x_raw;
-//         y_center = y_raw;
-//         calibrated = true;
-//     }
 
-//     // Normalize with fixed ranges
-//     float x_norm = (x_raw - x_center) / ((x_max - x_min) / 2.0f);
-//     float y_norm = (y_raw - y_center) / ((y_max - y_min) / 2.0f);
+    adc_select_input(joysticXadc);
+    float x = adc_read();
 
-//     // Clamp normalized output
-//     if (x_norm >  1.0f) x_norm = 1.0f;
-//     if (x_norm < -1.0f) x_norm = -1.0f;
-//     if (y_norm >  1.0f) y_norm = 1.0f;
-//     if (y_norm < -1.0f) y_norm = -1.0f;
+    adc_select_input(joysticYadc);
+    float y = adc_read();
 
-//     // Low-pass filter
-//     //x_filtered = x_filtered * (1.0f - alpha) + x_norm * alpha;
-//     //y_filtered = y_filtered * (1.0f - alpha) + y_norm * alpha;
 
-//     // Deadzone
-//     //if (fabsf(x_filtered) < deadzone) x_filtered = 0.0f;
-//     //if (fabsf(y_filtered) < deadzone) y_filtered = 0.0f;
+    float x_raw = (x * 3.3f) / 4095.0f;
+    float y_raw = (y * 3.3f) / 4095.0f;
 
-//     *x_out = x_norm;
-//     *y_out = y_norm;
-// }
+    if (!calibrated) {
+        x_center = x_raw;
+        y_center = y_raw;
+        calibrated = true;
+    }
+
+    // Normalize with fixed ranges
+    float x_norm = (x_raw - x_center) / ((x_max - x_min) / 2.0f);
+    float y_norm = (y_raw - y_center) / ((y_max - y_min) / 2.0f);
+
+    // Clamp normalized output
+    if (x_norm >  1.0f) x_norm = 1.0f;
+    if (x_norm < -1.0f) x_norm = -1.0f;
+    if (y_norm >  1.0f) y_norm = 1.0f;
+    if (y_norm < -1.0f) y_norm = -1.0f;
+
+    // Low-pass filter
+    //x_filtered = x_filtered * (1.0f - alpha) + x_norm * alpha;
+    //y_filtered = y_filtered * (1.0f - alpha) + y_norm * alpha;
+
+    // Deadzone
+    //if (fabsf(x_filtered) < deadzone) x_filtered = 0.0f;
+    //if (fabsf(y_filtered) < deadzone) y_filtered = 0.0f;
+
+    *x_out = x_norm;
+    *y_out = y_norm;
+}
 
 bool button_read(){
     return (gpio_get(joystickbutton) == 0);
