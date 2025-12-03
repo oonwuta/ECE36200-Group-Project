@@ -38,8 +38,7 @@ double x_thresh = 3.0; //do not currently know what these values will be thresho
 double y_thresh = 3.0;
 
 
-/*int main() {
-    stdio_init_all();
+void test_start() {
     sleep_ms(1000);
     
     display_init();
@@ -47,7 +46,7 @@ double y_thresh = 3.0;
     int x = 0, y = 0;
     int dx = 1, dy = 1;
     
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 50; i++) {
         display_clear();
         display_pixel_white(x, y);
         
@@ -62,14 +61,16 @@ double y_thresh = 3.0;
         }
     }
 
-    return 0;
-}*/
+    return;
+}
 
 
 int main()
 {
     stdio_init_all();
-    //sleep_ms(1000);
+    test_start(); 
+    play_song(120, canon_in_d, 0);
+    sleep_ms(1000);
     joystick_init(500); //whatever decided interval
     float x = 0;
     float y = 0;
@@ -84,7 +85,7 @@ int main()
     bool dead = false;
     //sleep_ms(1000);
     while(1){
-        joystick_get(&x, &y);
+        joystick_read(&x, &y);
         printf("X: %f, Y: %f\n", x, y);
         int xdir = x > x_thresh ? 1 : (x < -x_thresh ? -1 : 0); 
         int ydir = y > y_thresh ? 1 : (y < -y_thresh ? -1 : 0);

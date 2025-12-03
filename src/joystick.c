@@ -23,11 +23,11 @@ uint16_t x_buffer[OVERSAMPLE];
 uint16_t y_buffer[OVERSAMPLE];
 
 // Calibration data
-float x_min = 3.3f, x_max = 0.0f;
-float y_min = 3.3f, y_max = 0.0f;
+float x_min = 3.3f;
+float x_max = 0.0f;
+float y_min = 3.3f; 
+float y_max = 0.0f;
 bool calibrated = false;
-float x_center = 0.0f;
-float y_center = 0.0f;
 static float x_filtered = 0.0f;
 static float y_filtered = 0.0f;
 static float x_center = 0.0f;
@@ -118,41 +118,42 @@ void button_init(){
     gpio_pull_up(joystickbutton);
 }
 
-static float x_min = 0.2f, x_max = 3.1f;
-static float y_min = 0.2f, y_max = 3.1f;
 
-void joystick_read(float* x_out, float* y_out) {
+// void joystick_read(float* x_out, float* y_out) {
+//     // x_min = 0.2f; 
+//     // x_max = 3.1f;
+//     // y_min = 0.2f; 
+//     // y_max = 3.1f;
+//     float x_raw = (buffer[0] * 3.3f) / 4095.0f;
+//     float y_raw = (buffer[1] * 3.3f) / 4095.0f;
 
-    float x_raw = (buffer[0] * 3.3f) / 4095.0f;
-    float y_raw = (buffer[1] * 3.3f) / 4095.0f;
+//     if (!calibrated) {
+//         x_center = x_raw;
+//         y_center = y_raw;
+//         calibrated = true;
+//     }
 
-    if (!calibrated) {
-        x_center = x_raw;
-        y_center = y_raw;
-        calibrated = true;
-    }
+//     // Normalize with fixed ranges
+//     float x_norm = (x_raw - x_center) / ((x_max - x_min) / 2.0f);
+//     float y_norm = (y_raw - y_center) / ((y_max - y_min) / 2.0f);
 
-    // Normalize with fixed ranges
-    float x_norm = (x_raw - x_center) / ((x_max - x_min) / 2.0f);
-    float y_norm = (y_raw - y_center) / ((y_max - y_min) / 2.0f);
+//     // Clamp normalized output
+//     if (x_norm >  1.0f) x_norm = 1.0f;
+//     if (x_norm < -1.0f) x_norm = -1.0f;
+//     if (y_norm >  1.0f) y_norm = 1.0f;
+//     if (y_norm < -1.0f) y_norm = -1.0f;
 
-    // Clamp normalized output
-    if (x_norm >  1.0f) x_norm = 1.0f;
-    if (x_norm < -1.0f) x_norm = -1.0f;
-    if (y_norm >  1.0f) y_norm = 1.0f;
-    if (y_norm < -1.0f) y_norm = -1.0f;
+//     // Low-pass filter
+//     //x_filtered = x_filtered * (1.0f - alpha) + x_norm * alpha;
+//     //y_filtered = y_filtered * (1.0f - alpha) + y_norm * alpha;
 
-    // Low-pass filter
-    //x_filtered = x_filtered * (1.0f - alpha) + x_norm * alpha;
-    //y_filtered = y_filtered * (1.0f - alpha) + y_norm * alpha;
+//     // Deadzone
+//     //if (fabsf(x_filtered) < deadzone) x_filtered = 0.0f;
+//     //if (fabsf(y_filtered) < deadzone) y_filtered = 0.0f;
 
-    // Deadzone
-    //if (fabsf(x_filtered) < deadzone) x_filtered = 0.0f;
-    //if (fabsf(y_filtered) < deadzone) y_filtered = 0.0f;
-
-    *x_out = x_norm;
-    *y_out = y_norm;
-}
+//     *x_out = x_norm;
+//     *y_out = y_norm;
+// }
 
 bool button_read(){
     return (gpio_get(joystickbutton) == 0);

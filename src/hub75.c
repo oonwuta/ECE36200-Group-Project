@@ -35,6 +35,9 @@ void display_init(void) {
     gpio_put(PIN_C, 0);
     gpio_put(PIN_D, 0);
     
+    // display_set_pixel(0,0,1,1,1);
+    // sleep_ms(100); 
+
     // Clear framebuffer
     display_clear();
 }
