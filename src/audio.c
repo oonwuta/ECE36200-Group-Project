@@ -54,6 +54,7 @@ void pwm_audio_handler() {
     pwm_set_chan_level(slice_num, chan, samp);
 }
 
+
 void init_pwm_audio() {
     gpio_set_function(36, GPIO_FUNC_PWM);
     uint slice_num = pwm_gpio_to_slice_num(36);
