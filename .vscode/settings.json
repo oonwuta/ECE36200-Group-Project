@@ -11,6 +11,7 @@
         "pio.h": "c",
         "dma.h": "c",
         "stdbool.h": "c",
-        "clocks.h": "c"
+        "clocks.h": "c",
+        "adc.h": "c"
     }
 }

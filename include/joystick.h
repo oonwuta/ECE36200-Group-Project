@@ -1,13 +1,12 @@
-#include "pico/stdlib.h"
-#include "hardware/timer.h"
-#include "hardware/irq.h"
-#include "hardware/adc.h"
-#include "hardware/dma.h"
-#include <string.h>
+#pragma once
 #include <stdint.h>
-#include <stdio.h>
+#include <stdbool.h>
 
-void joystick_init();
-void init_dma();
-void joystick_read(uint16_t* x_out, uint16_t* y_out);
+// Initialize joystick sampling with a given interval in microseconds
+void joystick_init(uint32_t interval_us);
+
+// Get latest normalized values (-1.0 to 1.0)
+void joystick_get(float *x, float *y);
+
+void button_init();
 bool button_read();

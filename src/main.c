@@ -38,7 +38,7 @@ double x_thresh = 3.0; //do not currently know what these values will be thresho
 double y_thresh = 3.0;
 
 
-int main() {
+/*int main() {
     stdio_init_all();
     sleep_ms(1000);
     
@@ -63,26 +63,32 @@ int main() {
     }
 
     return 0;
-}
+}*/
 
-/*
+
 int main()
 {
-    joystick_init();
-    uint16_t x = 0;
-    uint16_t y = 0;
+    stdio_init_all();
+    //sleep_ms(1000);
+    joystick_init(500); //whatever decided interval
+    float x = 0;
+    float y = 0;
     bool button_pressed = false;
     int screen_state = 0; //0 is start screen, 1 is game, 2 is high score
     display_init();
-    init_pwm_audio();
-    highscores_init_defaults(); //not yet included
+    //init_pwm_audio();
+    //highscores_init_defaults(); //not yet included | does nto work
     display_clear();
-    snake *head;
+    button_init();
+    snake *head = NULL;
     bool dead = false;
+    //sleep_ms(1000);
     while(1){
-        joystick_read(&x, &y);
+        joystick_get(&x, &y);
+        printf("X: %f, Y: %f\n", x, y);
         int xdir = x > x_thresh ? 1 : (x < -x_thresh ? -1 : 0); 
         int ydir = y > y_thresh ? 1 : (y < -y_thresh ? -1 : 0);
+        button_pressed = false;
         button_pressed = button_read(); //imagine that this function exists
         uint8_t startgame = 0; //0 not started, 1 just started, 2 in progress, 3 dead | I should actually make a new state but im lazy
         if(screen_state == 0)
@@ -132,7 +138,7 @@ int main()
         }
         display_refresh();
     }
-}*/
+}
 /*
 
 psuedocode draft for main is 

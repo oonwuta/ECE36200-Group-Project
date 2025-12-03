@@ -397,12 +397,16 @@ void highscore_display(void)
     
     uint32_t *scores;
     scores = malloc(5 * sizeof(uint32_t));
-    int check = load_highscores(scores); //should have the upper 15 bits store the name and the lower 17-10 bits store the actual score _____
+    int check = 0;//load_highscores(scores); //should have the upper 15 bits store the name and the lower 17-10 bits store the actual score _____
     while(check == -1)
     {
-        check = load_highscores(scores); //should have some timeout nature
+        check = 0;//load_highscores(scores); //should have some timeout nature
     }
-    
+    scores[0] = 0;
+    scores[1] = 0;
+    scores[2] = 0;
+    scores[3] = 0;
+    scores[4] = 0;
     int xpos = 5;
     int ypos = 9;
     for(int i = 0; i < 4; i++) //for each high
@@ -514,7 +518,7 @@ uint32_t death_screen_display(int x, int y)
         }
        
         display_refresh();
-        wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
+        //wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 5; i <= 9; i++)
         {
             display_set_pixel(i, 19, 0, 0, 0); //draw red line next to Start Game
@@ -552,7 +556,7 @@ uint32_t death_screen_display(int x, int y)
         }
         
         display_refresh();
-        wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
+        //wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 11; i <= 15; i++)
         {
             display_set_pixel(i, 19, 0, 0, 0); //draw red line next to Start Game
@@ -591,7 +595,7 @@ uint32_t death_screen_display(int x, int y)
         }
         
         display_refresh();
-        wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
+        //wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for(int i = 17; i <= 21; i++)
         {
             display_set_pixel(i, 19, 0, 0, 0); //draw red line next to Start Game
