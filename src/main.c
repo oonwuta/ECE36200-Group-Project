@@ -69,9 +69,9 @@ int main()
 {
     stdio_init_all();
     test_start(); 
-    play_song(120, canon_in_d, 0);
+    //play_song(120, canon_in_d, 0);
     sleep_ms(1000);
-    joystick_init(500); //whatever decided interval
+    joystick_init(); //whatever decided interval
     float x = 0;
     float y = 0;
     bool button_pressed = false;

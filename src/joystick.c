@@ -62,7 +62,6 @@ void joystick_init() {
     adc_gpio_init(joystickX);
     adc_gpio_init(joystickY);
 
-    adc_run(true);
 }
 
 // // Read joystick axes, apply oversampling, calibration, and normalization
@@ -116,10 +115,10 @@ void joystick_read(float* x_out, float* y_out) {
 
 
     adc_select_input(joysticXadc);
-    float x = adc_read();
+    uint16_t x = adc_read();
 
     adc_select_input(joysticYadc);
-    float y = adc_read();
+    uint16_t y = adc_read();
 
 
     float x_raw = (x * 3.3f) / 4095.0f;
