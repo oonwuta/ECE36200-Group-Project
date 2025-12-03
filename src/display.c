@@ -172,27 +172,40 @@ static void push(snake *head, uint32_t xpos, uint32_t ypos) //exchanging the new
 
 snake *init_snake_game(void)
 {
+    printf("init snake game\n");
     snake *head = calloc(sizeof(*head), 1); //no "if calloc == NULL" logic but also atp if that happenes the entire game breaks
     head->xpos = 16;
     head->ypos = 16;
     head->next = NULL;
-    return head;
-    for(int i = 0; i < 32; i++)
+    
+    // for(int i = 0; i < 32; i++)
+    // {
+    //     display_set_pixel(0, i, 1, 1, 1); //clear screen
+    //     display_set_pixel(31, i, 1, 1, 1); //clear screen
+    //     display_set_pixel(i, 0, 1, 1, 1); //clear screen
+    //     display_set_pixel(i, 31, 1, 1, 1); //clear screen
+    // }
+
+    for (int i = 0; i < 32; i++)
     {
-        display_set_pixel(0, i, 1, 1, 1); //clear screen
-        display_set_pixel(31, i, 1, 1, 1); //clear screen
-        display_set_pixel(i, 0, 1, 1, 1); //clear screen
-        display_set_pixel(i, 31, 1, 1, 1); //clear screen
+        for (int j = 0; i < 32; j++)
+        {
+            display_set_pixel(i, j, 1,1,1);
+        }
     }
+
+
+
     f_xpos = (rand() % 30 - 1 + 1) + 1; //this number gen not right lol
     f_ypos = (rand() % 30 - 1 + 1) + 1;
+    printf("putting food at: %d, %d\n", f_xpos, f_ypos);
     if(f_xpos == head->xpos && f_ypos == head->ypos) //just in case
     {
         f_xpos = 23;
         f_ypos = 23;
     }
     display_set_pixel(f_xpos, f_ypos, 0, 1, 0); //draw food
-
+    return head;
 }
 
 bool game_loop(int xdir, int ydir, snake *head)
