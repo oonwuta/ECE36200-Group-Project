@@ -16,5 +16,5 @@ void init_wavetable(void);
 void set_freq(int chan, float f);
 void init_pwm_audio();
 void pwm_audio_handler();
-
-
+void halt_pwm_audio();
+void set_master_volume(float v);

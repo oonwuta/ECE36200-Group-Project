@@ -27,9 +27,11 @@ enum notes {
 
 /* ===== SONGS ===== */
 extern const int canon_in_d[32];
+extern const int death[32];
+extern const int apple[32];
 
 /* ===== API ===== */
 void play_song(int bpm, const int *song, int channel);
 void stop_song(void); 
-void play_note(int note, int duration, int channel);
+//void play_note(int note, int duration, int channel);
 #endif

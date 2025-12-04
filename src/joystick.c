@@ -13,6 +13,7 @@ bool button_state = false;
 
 #define joystickX 41 //dummy number for now
 #define joystickY 40 //dummy number for y
+#define volume 45 //pin for volume adc
 #define joystickbutton 25
 #define joysticXadc 1 //adc channel for joystick pins
 #define joysticYadc 0 //adc channel for other pin
@@ -61,6 +62,7 @@ void joystick_init() {
     adc_init();
     adc_gpio_init(joystickX);
     adc_gpio_init(joystickY);
+    adc_gpio_init(volume);
 
 }
 
@@ -107,7 +109,7 @@ void button_init(){
 }
 
 
-void joystick_read(float* x_out, float* y_out) {
+void joystick_read(float* x_out, float* y_out, float* vol_out) {
     // x_min = 0.2f; 
     // x_max = 3.1f;
     // y_min = 0.2f; 
@@ -120,9 +122,14 @@ void joystick_read(float* x_out, float* y_out) {
     adc_select_input(joysticYadc);
     uint16_t y = adc_read();
 
+    adc_select_input(5);
+    uint16_t v = adc_read();
+
 
     float x_raw = (x * 3.3f) / 4095.0f;
     float y_raw = (y * 3.3f) / 4095.0f;
+    float v_raw = (v * 3.3f) / 4095.0f;
+
 
     if (!calibrated) {
         x_center = x_raw;
@@ -133,6 +140,7 @@ void joystick_read(float* x_out, float* y_out) {
     // Normalize with fixed ranges
     float x_norm = (x_raw - x_center) / ((x_max - x_min) / 2.0f);
     float y_norm = (y_raw - y_center) / ((y_max - y_min) / 2.0f);
+    float v_norm = v_raw / 3.3f; 
 
     // Clamp normalized output
     if (x_norm >  1.0f) x_norm = 1.0f;
@@ -150,6 +158,7 @@ void joystick_read(float* x_out, float* y_out) {
 
     *x_out = x_norm;
     *y_out = y_norm;
+    *vol_out = v_norm; 
 }
 
 bool button_read(){
