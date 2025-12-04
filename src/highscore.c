@@ -98,7 +98,7 @@ int highscores_load(highscore_eeprom_t *e, hs_entry_t out[HS_COUNT]) {
     for (int i = 0; i < HS_COUNT; i++) {
         int off = i * HS_ENTRY_BYTES;
         memcpy(out[i].name, &raw[off], 3); 
-        uint32_t s = (uint32_t)raw[off+3] << 24 | (uint32_t)raw[off+2] << 16 | (uint32_t)raw[off+1] << 8 | (uint32_t)raw[off+0];
+        uint32_t s = (uint32_t)raw[off+3] << 24 | (uint32_t)raw[off+2] << 16 | (uint32_t)raw[off+1] << 8 | (uint32_t)raw[off];
         s = (uint32_t)raw[off] | ((uint32_t)raw[off+1] << 8) | ((uint32_t)raw[off+2] << 16) | ((uint32_t)raw[off+3] << 24);
         out[i].score = s;
     }
@@ -120,7 +120,7 @@ int highscores_save(highscore_eeprom_t *e, const hs_entry_t in[HS_COUNT]) {
         raw[off+3] = (uint8_t)((s >> 24) & 0xFF);
         raw[off+2] = (uint8_t)((s >> 16) & 0xFF);
         raw[off+1] = (uint8_t)((s >> 8) & 0xFF);
-        raw[off+0] = (uint8_t)(s & 0xFF);
+        raw[off] = (uint8_t)(s & 0xFF);
     }
 
     //write entire block (28 bytes)
