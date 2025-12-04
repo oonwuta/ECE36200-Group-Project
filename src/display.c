@@ -102,7 +102,7 @@ int start_display(int y) //used huge aray to make display readable, is also poss
         {
             if(buff[i][j] == 1)
             {
-                display_set_pixel(j, i, 1, 1, 1); //white pixel
+                display_set_pixel(i, j, 1, 1, 1); //white pixel
             }
         }
     }
@@ -110,12 +110,24 @@ int start_display(int y) //used huge aray to make display readable, is also poss
     cursor =  cursor == 0 && y == -1? 1 : cursor == 1 && y == 1? 0 : cursor; //move cursor up and down
     if(cursor == 0)
     {
+        //clear red box around score
         for(int i = 2; i <= 24; i++)
         {
-            display_set_pixel(15, i, 1, 0, 0); //draw red line next to Start Game
-            display_set_pixel(23,  i, 1, 0, 0);
+            display_set_pixel(23, i, 0, 0, 0); 
+            display_set_pixel(31,  i, 0, 0, 0);
         }
-        for(int i = 15; i <= 23; i++)
+        for(int i = 23; i <= 31; i++)
+        {
+            display_set_pixel(i, 2, 0, 0, 0);
+            display_set_pixel(i, 24, 0, 0, 0);
+        }
+
+        for(int i = 2; i <= 24; i++)
+        {
+            display_set_pixel(14, i, 1, 0, 0); //draw red line next to Start Game
+            display_set_pixel(22,  i, 1, 0, 0);
+        }
+        for(int i = 14; i <= 22; i++)
         {
             display_set_pixel(i, 2, 1, 0, 0);
             display_set_pixel(i, 24, 1, 0, 0);
@@ -123,17 +135,32 @@ int start_display(int y) //used huge aray to make display readable, is also poss
         display_refresh();
 
         //wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
+        // for(int i = 2; i <= 24; i++)
+        // {
+        //     display_set_pixel(15, i, 0, 0, 0); //draw red line next to Start Game
+        //     display_set_pixel(23,  i, 0, 0, 0);
+        // }
+        // for(int i = 15; i <= 23; i++)
+        // {
+        //     display_set_pixel(i, 2, 0, 0, 0);
+        //     display_set_pixel(i, 24, 0, 0, 0);
+        // }
+
+        // display_refresh();
+    } else {
+
+        //clear red box around start game
         for(int i = 2; i <= 24; i++)
         {
-            display_set_pixel(15, i, 0, 0, 0); //draw red line next to Start Game
-            display_set_pixel(23,  i, 0, 0, 0);
+            display_set_pixel(14, i, 0, 0, 0); //draw red line next to Start Game
+            display_set_pixel(22,  i, 0, 0, 0);
         }
-        for(int i = 15; i <= 23; i++)
+        for(int i = 14; i <= 22; i++)
         {
             display_set_pixel(i, 2, 0, 0, 0);
             display_set_pixel(i, 24, 0, 0, 0);
         }
-    } else {
+
         for(int i = 2; i <= 24; i++)
         {
             display_set_pixel(23, i, 1, 0, 0); //draw red line next to High Scores
@@ -146,17 +173,17 @@ int start_display(int y) //used huge aray to make display readable, is also poss
         }
 
         display_refresh();
-        //wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
-        for(int i = 2; i <= 24; i++)
-        {
-            display_set_pixel(23, i, 0, 0, 0); //draw red line next to High Scores
-            display_set_pixel(31,  i, 0, 0, 0);
-        }
-        for(int i = 23; i <= 31; i++)
-        {
-            display_set_pixel(i, 2, 0, 0, 0);
-            display_set_pixel(i, 24, 0, 0, 0);
-        }
+        // //wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
+        // for(int i = 2; i <= 24; i++)
+        // {
+        //     display_set_pixel(23, i, 0, 0, 0); //draw red line next to High Scores
+        //     display_set_pixel(31,  i, 0, 0, 0);
+        // }
+        // for(int i = 23; i <= 31; i++)
+        // {
+        //     display_set_pixel(i, 2, 0, 0, 0);
+        //     display_set_pixel(i, 24, 0, 0, 0);
+        // }
     }
     return cursor;
 }
@@ -403,7 +430,7 @@ void highscore_display(void)
         {
             if(buff[i][j] == 1)
             {
-                display_set_pixel(j, i, 255, 255, 255); //white pixel
+                display_set_pixel(i, j, 255, 255, 255); //white pixel
             }
         }
     }
@@ -420,25 +447,25 @@ void highscore_display(void)
     scores[2] = 0;
     scores[3] = 0;
     scores[4] = 0;
-    int xpos = 5;
-    int ypos = 9;
+    int xpos = 9;
+    int ypos = 7;
     for(int i = 0; i < 4; i++) //for each high
     {
         int l1 = scores[i] >> 27; //first letter
         int l2 = (scores[i] >> 22) & 0x1F; //second letter
         int l3 = (scores[i] >> 17) & 0x1F; //third letter
-        int d3 = (scores[i]) & 0x01FFFF; //buffer for score
+        int d3 = (scores[i]) & 0x0001FFFF; //buffer for score
         int d1 = d3 / 100 + 26; //first digit
         int d2 = (d3 / 10) % 10 + 26; //second digit
         d3 = d3 % 10 + 26; //reusing d3 for third digit
         int l_deco[6] = {l1, l2, l3, d1, d2, d3}; //put into its own array for iteration
-        xpos = 5;
+        ypos = 7;
         for(int j = 0; j < 6; j++) //for each letter {XXX ###}
         {   
             int count = 0;
-            for(int k = 0; k < 5; k++) //for each row in specified letter/number
+            for(int l = 0; l < 5; l++) //for each row in specified letter/number
             {
-                for(int l = 0; l < 3; l++) //for each column in specified letter/number
+                for(int k = 0; k < 3; k++) //for each column in specified letter/number
                 {
                     if(letters[l_deco[j]][count] == 1) //l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
                         display_set_pixel(xpos + l, ypos + k, 1, 1, 1); //white pixel
@@ -447,9 +474,9 @@ void highscore_display(void)
                     count++;
                 }
             }
-            xpos += 4; //move x position for next letter/number
+            ypos += 4; //move y position for next high score
         }
-        ypos += 6; //move y position for next high score
+        xpos += 6; //move x position for next letter/number
     }
 
 }
