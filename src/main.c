@@ -86,7 +86,7 @@ int main()
     //sleep_ms(1000);
     while(1){
         joystick_read(&x, &y);
-        printf("X: %f, Y: %f\n", x, y);
+        printf("X: %f, Y: %f\r", x, y);
         int xdir = x > x_thresh ? 1 : (x < -x_thresh ? -1 : 0); 
         int ydir = y > y_thresh ? 1 : (y < -y_thresh ? -1 : 0);
         button_pressed = false;
