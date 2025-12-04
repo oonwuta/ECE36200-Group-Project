@@ -13,6 +13,13 @@ const int canon_in_d[32] = {
     F/2, F, A, C*2, G/2, G, B, D*2
 };
 
+const int death_song[32] = {
+    A, E*2, R, E*2, E*2, D*2, C*2, B*2, 
+    E, R, E, R, C, R, R, R,
+    R, R, R, R, R, R, R, R, 
+    R, R, R, R, R, R, R, R
+};
+
 /* ===== INTERNAL STATE (IRQ SHARED) ===== */
 static const int *g_song;
 static int g_song_len;
@@ -53,21 +60,25 @@ static void init_audio_timer(int bpm) {
 /* ===== NOTE IRQ ===== */
 void play_note_irq(void) {
     // clear alarm 0 interrupt
-    timer1_hw->intr = (1u << 0);
+    timer0_hw->intr = (1u << 1);
 
-    set_freq(g_channel % 2, g_note);
-
-    irq_set_enabled(TIMER1_IRQ_0, false);
+    //printf("stop note?");
+    stop_song(); 
+    
+    irq_set_enabled(TIMER0_IRQ_1, false);
 }
 
 /* ===== TIMER INIT ===== */
 static void init_note_timer(int duration) {
-    timer1_hw->inte = (1u << 0);
-    irq_set_exclusive_handler(TIMER1_IRQ_0, play_note_irq);
-    irq_set_enabled(TIMER1_IRQ_0, true);
+    //printf("note?");
+    set_freq(g_channel % 2, g_note);
 
-    timer1_hw->alarm[0] =
-        timer1_hw->timerawl + duration;
+    timer0_hw->inte = (1u << 1);
+    irq_set_exclusive_handler(TIMER0_IRQ_1, play_note_irq);
+    irq_set_enabled(TIMER0_IRQ_1, true);
+    
+    timer0_hw->alarm[1] =
+        timer0_hw->timerawl + duration;
 }
 
 /* ===== PUBLIC API ===== */
@@ -84,7 +95,7 @@ void play_song(int bpm, const int* song, int channel) {
 
 void stop_song(){
     timer0_hw->armed = (1u<<0);
-    play_note(R,5,0); 
+    halt_pwm_audio(); 
 }
 
 void play_note(int duration, int note, int channel) {
