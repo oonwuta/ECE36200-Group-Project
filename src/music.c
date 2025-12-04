@@ -19,9 +19,10 @@ static int g_song_len;
 static int g_song_index;
 static int g_bpm;
 static int g_channel;
+static int g_note;
 
 /* ===== TIMER IRQ ===== */
-void play_note_irq(void) {
+void play_song_irq(void) {
     // clear alarm 0 interrupt
     timer0_hw->intr = (1u << 0);
 
@@ -42,11 +43,31 @@ static void init_audio_timer(int bpm) {
     g_bpm = bpm;
 
     timer0_hw->inte = (1u << 0);
-    irq_set_exclusive_handler(TIMER0_IRQ_0, play_note_irq);
+    irq_set_exclusive_handler(TIMER0_IRQ_0, play_song_irq);
     irq_set_enabled(TIMER0_IRQ_0, true);
 
     timer0_hw->alarm[0] =
         timer0_hw->timerawl + (60000000 / bpm);
+}
+
+/* ===== NOTE IRQ ===== */
+void play_note_irq(void) {
+    // clear alarm 0 interrupt
+    timer1_hw->intr = (1u << 0);
+
+    set_freq(g_channel % 2, g_note);
+
+    irq_set_enabled(TIMER1_IRQ_0, false);
+}
+
+/* ===== TIMER INIT ===== */
+static void init_note_timer(int duration) {
+    timer1_hw->inte = (1u << 0);
+    irq_set_exclusive_handler(TIMER1_IRQ_0, play_note_irq);
+    irq_set_enabled(TIMER1_IRQ_0, true);
+
+    timer1_hw->alarm[0] =
+        timer1_hw->timerawl + duration;
 }
 
 /* ===== PUBLIC API ===== */
@@ -60,3 +81,19 @@ void play_song(int bpm, const int* song, int channel) {
 
     init_audio_timer(bpm);
 }
+
+void stop_song(){
+    timer0_hw->armed = (1u<<0);
+    play_note(R,5,0); 
+}
+
+void play_note(int duration, int note, int channel) {
+    //duration in us, use enum for note
+    init_pwm_audio();
+
+    g_note = note;
+    g_channel = channel;
+
+    init_note_timer(duration);
+}
+
