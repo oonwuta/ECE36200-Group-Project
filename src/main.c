@@ -203,3 +203,121 @@ main: //kind of a state machine
             print score, print if high score //can also just print leaderboard
             wait for button to go back to start screen
 */
+
+//test for eeprom/highscore, running into issues where im stuck loading eeprom (highscores_load)
+static void i2c_scan(i2c_inst_t *i2c) {
+    printf("I2C scan: ");
+    for (int addr = 1; addr < 0x78; addr++) 
+    {
+        int r = i2c_write_blocking(i2c, (uint8_t)addr, NULL, 0, false);
+        if (r >= 0) 
+        {
+            printf("0x%02X ", addr);
+        }
+    }
+    printf("\n");
+}
+
+int main(void) {
+    stdio_init_all();
+    sleep_ms(1200);
+
+    printf("\nHighscore test\n");
+    printf("Type a number + Enter to insert; 'p' to print; 'q' to quit.\n\n");
+
+    //init I2C pins & bus
+    gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
+    gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
+    i2c_init(I2C_PORT_USED, 100000);
+
+    i2c_scan(I2C_PORT_USED);
+
+    //setup EEPROM handle (use default address unless you changed it)
+    highscore_eeprom_t e;
+    eeprom_init(I2C_PORT_USED, EEPROM_I2C_ADDR_DEFAULT, &e);
+
+    //load & print existing highscores (or zeros if read failed)
+    uint32_t scores[HS_COUNT];
+    if (highscores_load(&e, scores) < 0) {
+        printf("Couldn't read highscores; starting with zeros.\n");
+        for (int i = 0; i < HS_COUNT; ++i) scores[i] = 0;
+    }
+
+    printf("\nCurrent highscores:\n");
+    for (int i = 0; i < HS_COUNT; ++i) {
+        printf(" %2d: %10u\n", i+1, (unsigned)scores[i]);
+    }
+
+    char line[64];
+    for(;;) 
+    {
+        printf("\n> ");
+        fflush(stdout);
+
+        if (!fgets(line, sizeof(line), stdin)) 
+        {
+            continue;
+        }
+        // strip newline
+        char *nl = strchr(line, '\n');
+        if (nl) 
+        {
+            *nl = '\0';
+        }
+
+        if (line[0] == '\0') 
+        {
+            continue;
+        }
+
+        if (line[0] == 'q' || line[0] == 'Q') 
+        {
+            printf("Quitting.\n");
+            break;
+        }
+
+        if (line[0] == 'p' || line[0] == 'P') 
+        {
+            if (highscores_load(&e, scores) == 0) 
+            {
+                printf("\nHighscores:\n");
+                for (int i = 0; i < HS_COUNT; ++i) printf(" %2d: %10u\n", i+1, (unsigned)scores[i]);
+            } 
+            else 
+            {
+                printf("Error reading highscores.\n");
+            }
+            continue;
+        }
+
+        long v = atoi(line);
+        if (v < 0) 
+        {
+            printf("Negative values not supported.\n");
+            continue;
+        }
+        uint32_t val = (uint32_t)v;
+
+        int res = highscores_insert_and_save(&e, val);
+        if (res < 0) 
+        {
+            printf("I2C/write error while inserting.\n");
+        } 
+        else if (res == 0) 
+        {
+            printf("Not high enough to enter top %d.\n", HS_COUNT);
+        } 
+        else 
+        {
+            highscores_load(&e, scores);
+            printf("Inserted %u — updated highscores:\n", val);
+            for (int i = 0; i < HS_COUNT; i++) 
+            {
+                printf(" %2d: %10u\n", i+1, (unsigned)scores[i]);
+            }
+            printf("\nPower-cycle to verify persistence.\n");
+        }
+    }
+
+    return 0;
+}
