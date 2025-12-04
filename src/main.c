@@ -10,10 +10,7 @@
 #include "highscore.h"
 //////////////////////////////////////////////////////////////////////////////
 
-
-
 //////////////////////////////////////////////////////////////////////////////
-
 
 #include <stdio.h>
 #include <string.h>
@@ -24,39 +21,43 @@ static void kill_snake(snake *head)
 {
     snake *next = head->next;
     snake *prev;
-    while(next != NULL)
+    while (next != NULL)
     {
         prev = head;
         head = next;
         next = head->next;
         free(prev);
     }
-    free(head);   
+    free(head);
 }
 
-double x_thresh = 0.5; //do not currently know what these values will be thresholds needs to be greatenough where diagonal inputs do not generate input on both x and y
+double x_thresh = 0.5; // do not currently know what these values will be thresholds needs to be greatenough where diagonal inputs do not generate input on both x and y
 double y_thresh = 0.5;
 
-
-void test_start() {
+void test_start()
+{
     sleep_ms(1000);
-    
+
     display_init();
-    
+
     int x = 0, y = 0;
     int dx = 1, dy = 1;
-    
-    for (int i = 0; i < 50; i++) {
+
+    for (int i = 0; i < 50; i++)
+    {
         display_clear();
         display_pixel_white(x, y);
-        
+
         x += dx;
         y += dy;
-        
-        if (x <= 0 || x >= PANEL_WIDTH - 1) dx = -dx;
-        if (y <= 0 || y >= PANEL_HEIGHT - 1) dy = -dy;
-        
-        for (int j = 0; j < 10; j++) {
+
+        if (x <= 0 || x >= PANEL_WIDTH - 1)
+            dx = -dx;
+        if (y <= 0 || y >= PANEL_HEIGHT - 1)
+            dy = -dy;
+
+        for (int j = 0; j < 10; j++)
+        {
             display_refresh();
         }
     }
@@ -64,80 +65,100 @@ void test_start() {
     return;
 }
 
+static void loop_until_button_switch(bool start_state)
+{
+    bool button_pressed;
+    while (button_pressed == start_state)
+    {
+        sleep_ms(1);
+        button_pressed = button_read();
+    }
+    return;
+}
 
 int main()
 {
     stdio_init_all();
-    test_start(); 
-    //play_song(120, canon_in_d, 0);
+    test_start();
+    // play_song(120, canon_in_d, 0);
     sleep_ms(1000);
-    joystick_init(); //whatever decided interval
+    joystick_init(); // whatever decided interval
     float x = 0;
     float y = 0;
     bool button_pressed = false;
-    int screen_state = 0; //0 is start screen, 1 is game, 2 is high score
+    int screen_state = 0; // 0 is start screen, 1 is game, 2 is high score
+    // int prev_screen_state = 0;
     display_init();
-    //init_pwm_audio();
-    //highscores_init_defaults(); //not yet included | does nto work
+    // init_pwm_audio();
+    // highscores_init_defaults(); //not yet included | does nto work
     display_clear();
     button_init();
     snake *head = NULL;
     bool dead = false;
-    //sleep_ms(1000);
-    while(1){
+    // sleep_ms(1000);
+    while (1)
+    {
         joystick_read(&x, &y);
-        //printf("X: %f, Y: %f\n", x, y);
+        // printf("X: %f, Y: %f\n", x, y);
         int xdir = (x > x_thresh && x > y) ? 1 : (x < -x_thresh && x < y ? -1 : 0);
         int ydir = (y > y_thresh && y >= x) ? 1 : (y < -y_thresh && y <= x ? -1 : 0);
-        //printf("dir: %d, %d\n", xdir, ydir);
+        // printf("dir: %d, %d\n", xdir, ydir);
         button_pressed = false;
-        button_pressed = button_read(); //imagine that this function exists
-        uint8_t startgame = 0; //0 not started, 1 just started, 2 in progress, 3 dead | I should actually make a new state but im lazy
-        if(screen_state == 0)
+        button_pressed = button_read(); // imagine that this function exists
+        uint8_t startgame = 0;          // 0 not started, 1 just started, 2 in progress, 3 dead | I should actually make a new state but im lazy
+        if (screen_state == 0)
         {
             int cursor = start_display(ydir);
-            if(button_pressed)
+            if (button_pressed)
             {
-                //some code that accepts x, y and button press to select and returns the next screen state
-                screen_state = cursor == 0 ? 1 : 2; //to be changed to the output of that function
-                startgame = cursor == 0 ? 1 : 0; //start game if "start" was selected
+                //loop_until_button_switch(button_pressed);
+                // some code that accepts x, y and button press to select and returns the next screen state
+                screen_state = cursor == 0 ? 1 : 2; // to be changed to the output of that function
+                startgame = cursor == 0 ? 1 : 0;    // start game if "start" was selected
                 display_clear();
                 display_refresh();
             }
-        } else if (screen_state == 1)
+        }
+        else if (screen_state == 1)
         {
-            //game code here
-            if(startgame == 1)
+            // game code here
+            if (startgame == 1)
             {
+                printf("Start Game\n");
                 head = init_snake_game();
-                startgame += 1; //move to in progress
+                startgame += 1; // move to in progress
             }
-            dead = game_loop(xdir, ydir, head); //function that runs the game and returns true if player died
-            if(dead)
+            dead = game_loop(xdir, ydir, head); // function that runs the game and returns true if player died
+            if (dead)
             {
-                if(startgame == 2)
+                if (startgame == 2)
                 {
-                    
-                    kill_snake(head); //free snake memory
-                    startgame += 1; //move to dead state
+
+                    kill_snake(head); // free snake memory
+                    startgame += 1;   // move to dead state
                 }
-                uint32_t runscore = death_screen_display(xdir, ydir); //function that displays score and if high score
-                if(button_pressed)
+                uint32_t runscore = death_screen_display(xdir, ydir); // function that displays score and if high score
+                if (button_pressed)
                 {
-                    //compare highscore in here and then store here if highscore is to be determined here
+                    // compare highscore in here and then store here if highscore is to be determined here
                     display_clear();
                     screen_state = 2;
                 }
             }
-
-        } else if (screen_state == 2)
+        }
+        else if (screen_state == 2)
         {
-            highscore_display();
-            //display high scores and wait for button press to go back to start screen
-            if(button_pressed)
+
+            // display high scores and wait for button press to go back to start screen
+            if (button_pressed)
             {
+                //loop_until_button_switch(button_pressed);
                 display_clear();
                 screen_state = 0;
+            }
+            else
+            {
+                highscore_display();
             }
         }
         display_refresh();
@@ -145,7 +166,7 @@ int main()
 }
 /*
 
-psuedocode draft for main is 
+psuedocode draft for main is
 main: //kind of a state machine
     game start, init joystick,
     while(1):
@@ -159,6 +180,6 @@ main: //kind of a state machine
         else if in game:
             dead = update_snake(joystickx, joysticky) //function will have to know board state and return if player lost or not
         else if dead:
-            print score, print if high score //can also just print leaderboard 
+            print score, print if high score //can also just print leaderboard
             wait for button to go back to start screen
 */
