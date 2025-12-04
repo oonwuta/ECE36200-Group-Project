@@ -25,3 +25,5 @@ snake *init_snake_game(void);
 int start_display(int y);
 bool game_loop(int xdir, int ydir, snake *head);
 void highscore_display(); //int prev_screen_state
+void game_loop_update_screen_contents();
+

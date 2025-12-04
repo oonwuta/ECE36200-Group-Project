@@ -17,6 +17,8 @@
 #include "pico/stdlib.h"
 #include "hub75.h"
 
+#define COUNTER_TOP 32
+
 static void kill_snake(snake *head)
 {
     snake *next = head->next;
@@ -87,14 +89,16 @@ int main()
     float y = 0;
     bool button_pressed = false;
     int screen_state = 0; // 0 is start screen, 1 is game, 2 is high score
+    int game_timer = 0;
     // int prev_screen_state = 0;
     display_init();
     // init_pwm_audio();
     // highscores_init_defaults(); //not yet included | does nto work
-    display_clear();
     button_init();
     snake *head = NULL;
     bool dead = false;
+    uint8_t startgame = 0; // 0 not started, 1 just started, 2 in progress, 3 dead | I should actually make a new state but im lazy
+
     // sleep_ms(1000);
     while (1)
     {
@@ -105,14 +109,13 @@ int main()
         // printf("dir: %d, %d\n", xdir, ydir);
         button_pressed = false;
         button_pressed = button_read(); // imagine that this function exists
-        uint8_t startgame = 0;          // 0 not started, 1 just started, 2 in progress, 3 dead | I should actually make a new state but im lazy
         if (screen_state == 0)
         {
             int cursor = start_display(ydir);
             if (button_pressed)
             {
-                //loop_until_button_switch(button_pressed);
-                // some code that accepts x, y and button press to select and returns the next screen state
+                // loop_until_button_switch(button_pressed);
+                //  some code that accepts x, y and button press to select and returns the next screen state
                 screen_state = cursor == 0 ? 1 : 2; // to be changed to the output of that function
                 startgame = cursor == 0 ? 1 : 0;    // start game if "start" was selected
                 display_clear();
@@ -121,30 +124,47 @@ int main()
         }
         else if (screen_state == 1)
         {
-            // game code here
             if (startgame == 1)
             {
                 printf("Start Game\n");
                 head = init_snake_game();
                 startgame += 1; // move to in progress
             }
-            dead = game_loop(xdir, ydir, head); // function that runs the game and returns true if player died
-            if (dead)
+            game_timer += 1;
+            if (game_timer >= COUNTER_TOP)
             {
-                if (startgame == 2)
+                game_timer = 0;
+                if (!dead)
                 {
+                    // game code here
+                    dead = game_loop(xdir, ydir, head); // function that runs the game and returns true if player died
+                    game_loop_update_screen_contents();
 
-                    kill_snake(head); // free snake memory
-                    startgame += 1;   // move to dead state
+                    if (dead)
+                    {
+                        display_clear();
+                    }
                 }
-                uint32_t runscore = death_screen_display(xdir, ydir); // function that displays score and if high score
-                if (button_pressed)
+
+                else if (dead)
                 {
-                    // compare highscore in here and then store here if highscore is to be determined here
-                    display_clear();
-                    screen_state = 2;
+                    if (startgame == 2)
+                    {
+
+                        kill_snake(head); // free snake memory
+                        startgame += 1;   // move to dead state
+                    }
+                    uint32_t runscore = death_screen_display(xdir, ydir); // function that displays score and if high score
+                    if (button_pressed)
+                    {
+                        // compare highscore in here and then store here if highscore is to be determined here
+                        display_clear();
+                        screen_state = 2;
+                    }
                 }
             }
+
+            
         }
         else if (screen_state == 2)
         {
@@ -152,7 +172,7 @@ int main()
             // display high scores and wait for button press to go back to start screen
             if (button_pressed)
             {
-                //loop_until_button_switch(button_pressed);
+                // loop_until_button_switch(button_pressed);
                 display_clear();
                 screen_state = 0;
             }
