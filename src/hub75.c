@@ -46,9 +46,13 @@ void display_init(void) {
 void display_set_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
     if (x < 0 || x >= PANEL_WIDTH || y < 0 || y >= PANEL_HEIGHT) return;
     
-    framebuffer[y][x].r = r ? 1 : 0;
-    framebuffer[y][x].g = g ? 1 : 0;
-    framebuffer[y][x].b = b ? 1 : 0;
+    // framebuffer[y][x].r = r ? 1 : 0;
+    // framebuffer[y][x].g = g ? 1 : 0;
+    // framebuffer[y][x].b = b ? 1 : 0;
+
+    framebuffer[x][y].r = r ? 1 : 0;
+    framebuffer[x][y].g = g ? 1 : 0;
+    framebuffer[x][y].b = b ? 1 : 0;
 }
 
 // Clear the framebuffer
