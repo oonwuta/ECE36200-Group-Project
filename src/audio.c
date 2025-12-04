@@ -6,6 +6,7 @@ int offset0 = 0;
 int step1 = 0;
 int offset1 = 0;
 int volume = 2400;
+static float g_volume = 0.5f;   // 0.0 – 1.0
 
 void init_wavetable(void) {
     for(int i=0; i < N; i++)
@@ -48,8 +49,19 @@ void pwm_audio_handler() {
         offset1 -= (N << 16);
     }
 
-    uint samp = wavetable[offset0 >> 16] + wavetable[offset1 >> 16];
-    samp = (samp * period)/(1 << 16);
+    int32_t samp =
+    (int32_t)wavetable[offset0 >> 16] +
+    (int32_t)wavetable[offset1 >> 16];
+
+    /* apply volume (0.0 – 1.0) */
+    samp = (int32_t)(samp * g_volume);
+
+    /* scale to PWM period */
+    samp = (samp * period) >> 16;
+
+    /* clamp (important!) */
+    if (samp < 0) samp = 0;
+    if (samp > (int32_t)period) samp = period;
 
     pwm_set_chan_level(slice_num, chan, samp);
 }
@@ -57,6 +69,12 @@ void pwm_audio_handler() {
 void halt_pwm_audio(void) {
     uint slice_num = pwm_gpio_to_slice_num(36);
     pwm_set_enabled(slice_num, false);
+}
+
+void set_master_volume(float v) {
+    if (v < 0.0f) v = 0.0f;
+    if (v > 1.0f) v = 1.0f;
+    g_volume = v;
 }
 
 void init_pwm_audio(void) {

@@ -22,6 +22,7 @@
 #include <string.h>
 #include "pico/stdlib.h"
 #include "hub75.h"
+float g_volume = 0; 
 
 static void kill_snake(snake *head)
 {
@@ -72,15 +73,8 @@ int main()
 {
     stdio_init_all();
     test_start(); 
-    play_song(120, death_song, 0);
-    sleep_ms(5000);
-    stop_song(); 
-    sleep_ms(1000); 
-    play_note(440, 5000000, 0);
-    sleep_ms(1000); 
-    play_note(440, 5000000, 0);
- 
-
+    play_song(120, canon_in_d, 0);
+    
     joystick_init(); //whatever decided interval
     float x = 0;
     float y = 0;
@@ -97,7 +91,8 @@ int main()
     //sleep_ms(1000);
     while(1){
         joystick_read(&x, &y, &vol);
-        printf("X: %f, Y: %f, V:%f\n", x, y, vol);
+        set_master_volume(vol);
+        //printf("X: %f, Y: %f, V:%f\n", x, y, vol);
         int xdir = (x > x_thresh && x > y) ? 1 : (x < -x_thresh && x < y ? -1 : 0);
         int ydir = (y > y_thresh && y >= x) ? 1 : (y < -y_thresh && y <= x ? -1 : 0);
         //printf("dir: %d, %d\n", xdir, ydir);
