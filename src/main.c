@@ -34,8 +34,8 @@ static void kill_snake(snake *head)
     free(head);   
 }
 
-double x_thresh = 3.0; //do not currently know what these values will be thresholds needs to be greatenough where diagonal inputs do not generate input on both x and y
-double y_thresh = 3.0;
+double x_thresh = 0.5; //do not currently know what these values will be thresholds needs to be greatenough where diagonal inputs do not generate input on both x and y
+double y_thresh = 0.5;
 
 
 void test_start() {
@@ -86,9 +86,10 @@ int main()
     //sleep_ms(1000);
     while(1){
         joystick_read(&x, &y);
-        printf("X: %f, Y: %f\r", x, y);
-        int xdir = x > x_thresh ? 1 : (x < -x_thresh ? -1 : 0); 
-        int ydir = y > y_thresh ? 1 : (y < -y_thresh ? -1 : 0);
+        //printf("X: %f, Y: %f\n", x, y);
+        int xdir = (x > x_thresh && x > y) ? 1 : (x < -x_thresh && x < y ? -1 : 0);
+        int ydir = (y > y_thresh && y >= x) ? 1 : (y < -y_thresh && y <= x ? -1 : 0);
+        //printf("dir: %d, %d\n", xdir, ydir);
         button_pressed = false;
         button_pressed = button_read(); //imagine that this function exists
         uint8_t startgame = 0; //0 not started, 1 just started, 2 in progress, 3 dead | I should actually make a new state but im lazy
@@ -98,8 +99,10 @@ int main()
             if(button_pressed)
             {
                 //some code that accepts x, y and button press to select and returns the next screen state
-                screen_state = cursor == 0? 1 : 2; //to be changed to the output of that function
-                startgame = 1;
+                screen_state = cursor == 0 ? 1 : 2; //to be changed to the output of that function
+                startgame = cursor == 0 ? 1 : 0; //start game if "start" was selected
+                display_clear();
+                display_refresh();
             }
         } else if (screen_state == 1)
         {
