@@ -87,6 +87,7 @@ int main()
     joystick_init(); // whatever decided interval
     float x = 0;
     float y = 0;
+    float v = 0;
     bool button_pressed = false;
     int screen_state = 0; // 0 is start screen, 1 is game, 2 is high score
     int game_timer = 0;
@@ -102,7 +103,8 @@ int main()
     // sleep_ms(1000);
     while (1)
     {
-        joystick_read(&x, &y);
+        joystick_read(&x, &y, &v);
+        set_master_volume(v);
         // printf("X: %f, Y: %f\n", x, y);
         int xdir = (x > x_thresh && x > y) ? 1 : (x < -x_thresh && x < y ? -1 : 0);
         int ydir = (y > y_thresh && y >= x) ? 1 : (y < -y_thresh && y <= x ? -1 : 0);
