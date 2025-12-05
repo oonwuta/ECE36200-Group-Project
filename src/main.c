@@ -179,6 +179,7 @@ int main()
 
                     if (dead)
                     {
+                        play_song(60, death, 0);
                         display_clear();
                     }
                 }
