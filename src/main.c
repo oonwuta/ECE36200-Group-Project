@@ -109,6 +109,7 @@ int main()
     bool hs_loaded = false;
     srand(time(NULL));
     int cursor = 0;
+    bool button_buffer[8];
     // sleep_ms(1000);
 
     //WIPE EEPROM TEST////////////////////////////////////
@@ -131,7 +132,7 @@ int main()
     // };
 
     // highscores_save(&hsstruct, &wipe_out);
-    //////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////
     
     while (1)
     {
@@ -143,6 +144,19 @@ int main()
         // printf("dir: %d, %d\n", xdir, ydir);
         button_pressed = false;
         button_pressed = button_read(); // imagine that this function exists
+
+        // bool temp_button_buffer[8] = button_pressed | button_buffer[0] << 1 | button_buffer[1] << 2 | button_buffer[2] << 3 | button_buffer[3] << 4 | button_buffer[4] << 5 | button_buffer[5] << 6 | button_buffer[6] << 7;
+        // memcpy(button_buffer, temp_button_buffer, 8);  ;
+
+        // button_pressed = true;
+        // for (int i = 0; i < 8; i++)
+        // {
+        //     if (button_buffer[i] == false)
+        //     {
+        //         button_pressed = false;
+        //     }
+        // }
+
         if (screen_state == 0)
         {
             cursor = start_display(ydir);
@@ -161,7 +175,6 @@ int main()
         {
             if (startgame == 1)
             {
-                printf("Start Game\n");
                 head = init_snake_game();
                 startgame += 1; // move to in progress
                 dead = false;
@@ -242,7 +255,6 @@ int main()
                         hs_entered = true;
 
                         screen_state = 2;
-                        button_pressed = false;
                     }
                 }
             }
@@ -262,7 +274,6 @@ int main()
                 dead = false;
                 hs_entered = false;
                 hs_loaded = false;
-                button_pressed = false;
             }
             else
             {

@@ -114,7 +114,7 @@ int start_display(int y)                                                        
 
     if (cursor != 0 && cursor != 1)
     {
-        cursor = 0;
+        cursor = 1;
     }
     if (cursor == 0)
     {
@@ -305,7 +305,6 @@ snake *init_snake_game(void)
 
 bool game_loop(int xdir, int ydir, snake *head)
 {
-    printf("Game loop:\n");
     uint32_t prevxpos = head->xpos;
     uint32_t prevypos = head->ypos;
 
@@ -425,17 +424,17 @@ bool game_loop(int xdir, int ydir, snake *head)
             head->ypos -= 1;
         }
     }
-    printf("after move update: sdir: %d, head->xpos: %d, head->ypos: %d\n", sdir, head->xpos, head->ypos);
+    // printf("after move update: sdir: %d, head->xpos: %d, head->ypos: %d\n", sdir, head->xpos, head->ypos);
 
     if (game_board[head->xpos][head->ypos]->isEdge == true || game_board[head->xpos][head->ypos]->snake_segment != NULL) // if new position of head is inside the edge or part of the snake (before setting new segment for head)
     {
         if (game_board[head->xpos][head->ypos]->isEdge == true)
         {
-            printf("Player died from hitting edge, head: %d, %d, edge: %d, %d\n", head->xpos, head->ypos, game_board[head->xpos][head->ypos]->x, game_board[head->xpos][head->ypos]->y);
+            // printf("Player died from hitting edge, head: %d, %d, edge: %d, %d\n", head->xpos, head->ypos, game_board[head->xpos][head->ypos]->x, game_board[head->xpos][head->ypos]->y);
         }
         else
         {
-            printf("Player died from hitting snake segment, %X, %X, %d, %d, %d, %d\n", head, game_board[head->xpos][head->ypos]->snake_segment, head->xpos, head->ypos, game_board[head->xpos][head->ypos]->snake_segment->xpos, game_board[head->xpos][head->ypos]->snake_segment->ypos);
+            // printf("Player died from hitting snake segment, %X, %X, %d, %d, %d, %d\n", head, game_board[head->xpos][head->ypos]->snake_segment, head->xpos, head->ypos, game_board[head->xpos][head->ypos]->snake_segment->xpos, game_board[head->xpos][head->ypos]->snake_segment->ypos);
         }
 
         return true; // player died
@@ -590,11 +589,11 @@ void highscore_display(highscore_eeprom_t *e, hs_entry_t *scores, bool *hs_loade
                 scores[i].name[2] = 0;
                 scores[i].score = 0;
             }
-            printf("Loading from eeprom failed. Replacing values\n");
+            // printf("Loading from eeprom failed. Replacing values\n");
         }
         else
         {
-            printf("Loading from eeprom success\n");
+            // printf("Loading from eeprom success\n");
         }
         *hs_loaded = true;
     }
@@ -827,7 +826,7 @@ hs_entry_t *death_screen_display(int x, int y)
     hs_entry->name[2] = char3;
     hs_entry->score = score;
 
-    printf("HS ENTRY: %d%d%d %d\n", char1, char2, char3, score);
+    // printf("HS ENTRY: %d%d%d %d\n", char1, char2, char3, score);
     return hs_entry;
 }
 
