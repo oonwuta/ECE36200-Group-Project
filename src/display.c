@@ -110,6 +110,11 @@ int start_display(int y)                                                        
 
     cursor = (cursor == 0 && y == -1) ? 1 : (cursor == 1 && y == 1) ? 0
                                                                     : cursor; // move cursor up and down
+
+    if (cursor != 0 && cursor != 1)
+    {
+        cursor = 0;
+    }
     if (cursor == 0)
     {
         // clear red box around score

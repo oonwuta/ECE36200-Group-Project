@@ -108,28 +108,29 @@ int main()
     bool hs_entered = false;
     bool hs_loaded = false;
     srand(time(NULL));
+    int cursor = 0;
     // sleep_ms(1000);
 
     //WIPE EEPROM TEST////////////////////////////////////
-    hs_entry_t wipe_out[4] = 
-    {
-        {
-            .name = 0,
-            .score = 0
-        },
-        {
-            .name = 0,
-            .score = 0
-        },{
-            .name = 0,
-            .score = 0
-        },{
-            .name = 0,
-            .score = 0
-        }
-    };
+    // hs_entry_t wipe_out[4] = 
+    // {
+    //     {
+    //         .name = 0,
+    //         .score = 0
+    //     },
+    //     {
+    //         .name = 0,
+    //         .score = 0
+    //     },{
+    //         .name = 0,
+    //         .score = 0
+    //     },{
+    //         .name = 0,
+    //         .score = 0
+    //     }
+    // };
 
-    highscores_save(&hsstruct, &wipe_out);
+    // highscores_save(&hsstruct, &wipe_out);
     //////////////////////////////////////////////////////
     
     while (1)
@@ -144,7 +145,7 @@ int main()
         button_pressed = button_read(); // imagine that this function exists
         if (screen_state == 0)
         {
-            int cursor = start_display(ydir);
+            cursor = start_display(ydir);
             if (button_pressed)
             {
                 // loop_until_button_switch(button_pressed);
@@ -206,36 +207,34 @@ int main()
                         {
                             for (int i = 0; i < 4; i++)
                             {
-                                scores[i].name[0] = 'A';
-                                scores[i].name[1] = 'A';
-                                scores[i].name[2] = 'A';
+                                scores[i].name[0] = 0;
+                                scores[i].name[1] = 0;
+                                scores[i].name[2] = 0;
                                 scores[i].score = 0;
                             }
                         }
 
                         int position = 4;
-                        while (hs_entry->score > scores[position-1])
-
-                        //compare first
-                        if (hs_entry->score > scores[3].score)
+                        while (position > 0 && hs_entry->score > scores[position-1].score)
                         {
-                            scores[3].name[0] = hs_entry->name[0];
-                            scores[3].name[1] = hs_entry->name[1];
-                            scores[3].name[2] = hs_entry->name[2];
-                            scores[3].score = hs_entry->score;
+                            position -= 1;
                         }
 
-                        //move the rest up
-                        for (int i = 3; i > 0; i--)
+                        //SWAP DOWNWARD
+                        int temp_pos = 3;
+                        while (temp_pos > position)
                         {
-                            if (scores[i].score > scores[i-1].score)
-                            {
-                                scores[i-1].name[0] = scores[i].name[0];
-                                scores[i-1].name[1] = scores[i].name[1];
-                                scores[i-1].name[2] = scores[i].name[2];
-                                scores[i-1].score = scores[i].score;
-                            }
+                            scores[temp_pos].score = scores[temp_pos-1].score;
+                            scores[temp_pos].name[0] = scores[temp_pos-1].name[0];
+                            scores[temp_pos].name[1] = scores[temp_pos-1].name[1];
+                            scores[temp_pos].name[2] = scores[temp_pos-1].name[2];
+                            temp_pos-=1;
                         }
+
+                        scores[position].name[0] = hs_entry->name[0];
+                        scores[position].name[1] = hs_entry->name[1];
+                        scores[position].name[2] = hs_entry->name[2];
+                        scores[position].score = hs_entry->score;
 
                         highscores_save(&hsstruct, scores);
                         hs_entered = true;
@@ -256,6 +255,8 @@ int main()
                 // loop_until_button_switch(button_pressed);
                 display_clear();
                 screen_state = 0;
+                startgame = 0;
+                
                 dead = false;
                 hs_entered = false;
                 hs_loaded = false;

@@ -121,11 +121,11 @@ int highscores_load(highscore_eeprom_t *e, hs_entry_t out[HS_COUNT]) {
         return -1;
     }
 
-    // quick detect common erased/cleared garbage
-    if (raw_looks_erased_or_zero(raw, HS_TOTAL_BYTES)) {
-        printf("Highscores: raw looks erased/zero -> fail\n");
-        return -1;
-    }
+    // // quick detect common erased/cleared garbage
+    // if (raw_looks_erased_or_zero(raw, HS_TOTAL_BYTES)) {
+    //     printf("Highscores: raw looks erased/zero -> fail\n");
+    //     return -1;
+    // }
 
     // for (int i = 0; i < HS_COUNT; i++) {
     //     int off = i * HS_ENTRY_BYTES;
