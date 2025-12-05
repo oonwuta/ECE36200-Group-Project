@@ -141,6 +141,7 @@ int main()
         // printf("X: %f, Y: %f\n", x, y);
         int xdir = (x > x_thresh && x > y) ? 1 : (x < -x_thresh && x < y ? -1 : 0);
         int ydir = (y > y_thresh && y >= x) ? 1 : (y < -y_thresh && y <= x ? -1 : 0);
+        bool reset_button = false;
         // printf("dir: %d, %d\n", xdir, ydir);
         button_pressed = false;
         button_pressed = button_read(); // imagine that this function exists

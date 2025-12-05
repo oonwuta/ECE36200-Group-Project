@@ -19,7 +19,7 @@ bool button_state = false;
 #define joysticYadc 0 //adc channel for other pin
 #define OVERSAMPLE 64 
 
-bool button_mem[8] = {true, true, true, true, true, true, true, true}; // for button debouncing
+bool button_mem[8] = {false,false,false,false,false,false,false,false};
 
 uint16_t x_buffer[OVERSAMPLE];
 uint16_t y_buffer[OVERSAMPLE];
@@ -39,7 +39,7 @@ static const float alpha = 0.15f;   // Low-pass filter strength
 
 // DMA channels
 int dma_x_chan, dma_y_chan;
-
+bool lock = false;
 /*
 The way this works is first the joystick is initialized with the X and Y pins set to ADC. The function
 starts selecting X as the adc input and is put into round robin mode. dma is initialized to read from the adc
@@ -164,15 +164,19 @@ void joystick_read(float* x_out, float* y_out, float* vol_out) {
 
 bool button_read(){
     bool read = false;
+    
+    bool retval = false;
     for(int i = 7; i > 0; i--){
+        lock =(button_mem[i] == false && lock == true)? true : false;
         read = read || button_mem[i];
         button_mem[i] = button_mem[i-1];
     }
+   
     button_mem[0] = gpio_get(joystickbutton); //active low
-    bool retval = (read == false && button_mem[0] == false);
-    if(button_mem[0] ==  true){
-        for(int i = 7; i >= 0; i--)
-            button_mem[i] = true;
+    lock = (button_mem[0] == false && lock == true)? false : false;
+    retval = lock == true? 0 : (read == false && button_mem[0] == false);
+    if(retval == true){
+        lock = true;
     }
     return retval;
 }
