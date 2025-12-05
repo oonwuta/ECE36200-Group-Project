@@ -445,7 +445,7 @@ bool game_loop(int xdir, int ydir, snake *head)
     if (game_board[head->xpos][head->ypos]->isFood) // ate food
     {
         score += 1;
-        play_song(60, apple, 0);
+        play_song(180, apple, 0);
         push(head, prevxpos, prevypos); // add new segment, insert old head position as new segment right behind updated position
 
         game_board[head->xpos][head->ypos]->isFood = false;

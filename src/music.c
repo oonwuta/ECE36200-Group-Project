@@ -63,7 +63,7 @@ static void init_audio_timer(int bpm) {
     irq_set_enabled(TIMER0_IRQ_0, true);
 
     timer0_hw->alarm[0] =
-        timer0_hw->timerawl + (60000000 / bpm);
+        timer0_hw->timerawl + (60000000 / g_bpm);
 }
 
 // /* ===== NOTE IRQ ===== */

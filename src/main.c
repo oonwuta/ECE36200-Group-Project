@@ -83,7 +83,7 @@ int main()
 {
     stdio_init_all();
     test_start();
-    // play_song(120, canon_in_d, 0);
+    play_song(120, canon_in_d, 0);
     sleep_ms(1000);
     joystick_init(); // whatever decided interval
     float x = 0;
@@ -154,6 +154,7 @@ int main()
                 startgame = cursor == 0 ? 1 : 0;    // start game if "start" was selected
                 display_clear();
                 display_refresh();
+                button_pressed = false;
             }
         }
         else if (screen_state == 1)
@@ -179,7 +180,7 @@ int main()
 
                     if (dead)
                     {
-                        play_song(60, death, 0);
+                        play_song(80, death, 0);
                         display_clear();
                     }
                 }
@@ -241,11 +242,11 @@ int main()
                         hs_entered = true;
 
                         screen_state = 2;
+                        button_pressed = false;
                     }
                 }
             }
 
-            
         }
         else if (screen_state == 2)
         {
@@ -261,6 +262,7 @@ int main()
                 dead = false;
                 hs_entered = false;
                 hs_loaded = false;
+                button_pressed = false;
             }
             else
             {
