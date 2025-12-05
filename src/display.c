@@ -59,7 +59,7 @@ bool letters[36][15] = {{0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1},  // A
                         {1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0},  // 5
                         {0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0},  // 6
                         {1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0},  // 7
-                        {0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0},  // 8
+                        {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},  // 8
                         {0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1}}; // 9
 
 int start_display(int y)                                                                                                   // used huge aray to make display readable, is also possible to switch this to writing each pixel but since multiple people will be reading this, this is easier to visualize

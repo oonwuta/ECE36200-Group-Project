@@ -19,6 +19,7 @@ bool button_state = false;
 #define joysticYadc 0 //adc channel for other pin
 #define OVERSAMPLE 64 
 
+bool button_mem[8] = {false,false,false,false,false,false,false,false};
 
 uint16_t x_buffer[OVERSAMPLE];
 uint16_t y_buffer[OVERSAMPLE];
@@ -162,5 +163,12 @@ void joystick_read(float* x_out, float* y_out, float* vol_out) {
 }
 
 bool button_read(){
-    return (gpio_get(joystickbutton) == 0);
+    bool read = false;
+    for(int i = 7; i > 0; i--){
+        read = read || button_mem[i];
+        button_mem[i] = button_mem[i-1];
+    }
+    button_mem[0] = gpio_get(joystickbutton); //active low
+
+    return (read == false && button_mem[0] == false);
 }
