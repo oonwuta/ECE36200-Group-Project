@@ -11,7 +11,7 @@
 #include "highscore.h"
 
 uint8_t cursor = 0;
-uint8_t ycursor = 0;
+uint8_t ycursors[3] = {0, 0, 0};
 uint32_t f_xpos = 16;
 uint32_t f_ypos = 16;
 uint8_t sdir = 1;
@@ -237,10 +237,10 @@ snake *init_snake_game(void)
     game_board = malloc(sizeof(Grid **) * 32);
     for (int i = 0; i < 32; i++)
     {
-        game_board[i] = malloc(sizeof(Grid*) * 32);
+        game_board[i] = malloc(sizeof(Grid *) * 32);
         for (int j = 0; j < 32; j++)
         {
-            game_board[i][j] = malloc(sizeof(Grid));           
+            game_board[i][j] = malloc(sizeof(Grid));
 
             game_board[i][j]->isEdge = false;
             game_board[i][j]->isFood = false;
@@ -283,9 +283,11 @@ snake *init_snake_game(void)
     tail->prev = NULL;
     game_board[13][16]->snake_segment = tail;
 
-    f_xpos = (rand() % 30 - 1 + 1); // this number gen not right lol
-    f_ypos = (rand() % 30 - 1 + 1);
-    printf("putting food at: %d, %d\n", f_xpos, f_ypos);
+    do
+        {
+            f_xpos = (rand() % 30) + 1;
+            f_ypos = (rand() % 30) + 1;
+        } while (game_board[f_xpos][f_ypos]->snake_segment);
     if (game_board[f_xpos][f_ypos]->snake_segment != NULL) // just in case
     {
         f_xpos = 23;
@@ -301,12 +303,11 @@ bool game_loop(int xdir, int ydir, snake *head)
     uint32_t prevxpos = head->xpos;
     uint32_t prevypos = head->ypos;
 
+    // Progress note:
+    // Added game board array, now need to update movement logic and checking for game
 
-    //Progress note:
-    //Added game board array, now need to update movement logic and checking for game
-
-    //sdir: 0 nothing, 1 right, 2 down, 3 left, 4 up OLD
-    //NEW SDIR: 0 nothing, 1 down, 2 right, 3 up, 4 left
+    // sdir: 0 nothing, 1 right, 2 down, 3 left, 4 up OLD
+    // NEW SDIR: 0 nothing, 1 down, 2 right, 3 up, 4 left
     if (sdir == 0)
     {
         if (ydir == -1)
@@ -332,7 +333,7 @@ bool game_loop(int xdir, int ydir, snake *head)
     }
     else if (sdir == 1) // moving down
     {
-        // if (ydir == 1) 
+        // if (ydir == 1)
         // {
         //     head->xpos -= 1;
         //     sdir = 3;
@@ -376,7 +377,7 @@ bool game_loop(int xdir, int ydir, snake *head)
     }
     else if (sdir == 3) // moving up
     {
-        // if (ydir == -1) 
+        // if (ydir == -1)
         // {
         //     head->xpos += 1;
         //     sdir = 1;
@@ -408,7 +409,7 @@ bool game_loop(int xdir, int ydir, snake *head)
             head->xpos -= 1;
             sdir = 3;
         }
-        // else if (xdir == 1) 
+        // else if (xdir == 1)
         // {
         //     head->ypos += 1;
         //     sdir = 2;
@@ -430,18 +431,25 @@ bool game_loop(int xdir, int ydir, snake *head)
         {
             printf("Player died from hitting snake segment, %X, %X, %d, %d, %d, %d\n", head, game_board[head->xpos][head->ypos]->snake_segment, head->xpos, head->ypos, game_board[head->xpos][head->ypos]->snake_segment->xpos, game_board[head->xpos][head->ypos]->snake_segment->ypos);
         }
-        
+
         return true; // player died
     }
-    game_board[head->xpos][head->ypos]->snake_segment = head; //move head
+    game_board[head->xpos][head->ypos]->snake_segment = head; // move head
     // note that we do not need to check if it is colliding with food because the food position is now a snake piece giving the illusion of moving forward
     if (game_board[head->xpos][head->ypos]->isFood) // ate food
     {
+        score += 1;
         push(head, prevxpos, prevypos); // add new segment, insert old head position as new segment right behind updated position
 
         game_board[head->xpos][head->ypos]->isFood = false;
-        f_xpos = (rand() % 30 - 1 + 1);
-        f_ypos = (rand() % 30 - 1 + 1);
+
+        do
+        {
+            f_xpos = (rand() % 30) + 1;
+            f_ypos = (rand() % 30) + 1;
+        } while (game_board[f_xpos][f_ypos]->snake_segment);
+
+
         game_board[f_xpos][f_ypos]->isFood = true;
     }
     else
@@ -458,10 +466,10 @@ bool game_loop(int xdir, int ydir, snake *head)
 
             uint32_t tempx = current->xpos;
             uint32_t tempy = current->ypos;
-            game_board[current->xpos][current->ypos]->snake_segment = NULL; //remove current existence
+            game_board[current->xpos][current->ypos]->snake_segment = NULL; // remove current existence
             current->xpos = prevxpos;
             current->ypos = prevypos;
-            game_board[current->xpos][current->ypos]->snake_segment = current; //move forward
+            game_board[current->xpos][current->ypos]->snake_segment = current; // move forward
             prevxpos = tempx;
             prevypos = tempy;
             current = current->prev;
@@ -510,7 +518,7 @@ bool game_loop(int xdir, int ydir, snake *head)
 }
 
 // We are going to require external instructions including one to tlell the user to press any button to get out of highcore state due to not being able to display everything
-void highscore_display() // int prev_screen_state
+void highscore_display(highscore_eeprom_t *e, hs_entry_t *scores, bool *hs_loaded) // int prev_screen_state
 {
     // this isnt used but
     int buff[32][32] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  // 1
@@ -557,34 +565,44 @@ void highscore_display() // int prev_screen_state
         {
             if (buff[i][j] == 1)
             {
-                display_set_pixel(i, j, 255, 255, 255); // white pixel
+                display_set_pixel(i, j, 1, 1, 1); // white pixel
             }
         }
     }
 
-    uint32_t *scores;
-    scores = malloc(5 * sizeof(uint32_t));
-    int check = 0; // load_highscores(scores); //should have the upper 15 bits store the name and the lower 17-10 bits store the actual score _____
-    while (check == -1)
+    if (!(*hs_loaded))
     {
-        check = 0; // load_highscores(scores); //should have some timeout nature
+        int success = highscores_load(e, scores);
+
+        if (success == -1) // invalid read from eeprom
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                scores[i].name[0] = 0;
+                scores[i].name[1] = 0;
+                scores[i].name[2] = 0;
+                scores[i].score = 0;
+            }
+            printf("Loading from eeprom failed. Replacing values\n");
+        }
+        else
+        {
+            printf("Loading from eeprom success\n");
+        }
+        *hs_loaded = true;
     }
-    scores[0] = 0;
-    scores[1] = 0;
-    scores[2] = 0;
-    scores[3] = 0;
-    scores[4] = 0;
+
     int xpos = 9;
     int ypos = 7;
     for (int i = 0; i < 4; i++) // for each high
     {
-        int l1 = scores[i] >> 27;                 // first letter
-        int l2 = (scores[i] >> 22) & 0x1F;        // second letter
-        int l3 = (scores[i] >> 17) & 0x1F;        // third letter
-        int d3 = (scores[i]) & 0x0001FFFF;        // buffer for score
-        int d1 = d3 / 100 + 26;                   // first digit
-        int d2 = (d3 / 10) % 10 + 26;             // second digit
-        d3 = d3 % 10 + 26;                        // reusing d3 for third digit
+        int l1 = scores[i].name[0];                 // first letter
+        int l2 = scores[i].name[1];                 // second letter
+        int l3 = scores[i].name[2];                 // third letter
+        int d1 = scores[i].score / 100 + 26;       // first digit
+        int d2 = (scores[i].score / 10) % 10 + 26; // second digit
+        int d3 = scores[i].score % 10 + 26;       // reusing d3 for third digit
+        //printf("highscore display check: %c%c%c %c %c %c\n", l1, l2, l3, d1, d2, d3);
         int l_deco[6] = {l1, l2, l3, d1, d2, d3}; // put into its own array for iteration
         ypos = 7;
         for (int j = 0; j < 6; j++) // for each letter {XXX ###}
@@ -607,7 +625,7 @@ void highscore_display() // int prev_screen_state
     }
 }
 
-uint32_t death_screen_display(int x, int y)
+hs_entry_t *death_screen_display(int x, int y)
 // i can either pass in the score or keep it as a global variable in this function
 // I dont know if every score is being updated to the EEprom but if not then I can pull the
 // top 5 scores, sort, and compare it with all of them which would not take much time
@@ -619,7 +637,7 @@ uint32_t death_screen_display(int x, int y)
                         {0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  // 5
                         {0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},  // 6
                         {0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  // 7
-                        {1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  // 8
+                        {0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  // 8
                         {0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},  // 9
                         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  // 10
                         {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0},  // 11
@@ -656,19 +674,40 @@ uint32_t death_screen_display(int x, int y)
     }
 
     cursor = cursor == 0 && x == 1 ? 1 : (cursor == 1 && x == 1 ? 2 : (cursor == 1 && x == -1 ? 0 : (cursor == 2 && x == -1 ? 1 : cursor))); // move cursor up and down
-    ycursor = y ? (ycursor + 1) % 36 : ycursor;
-    if (cursor == 0)
+    ycursors[cursor] = (y == 1) ? (ycursors[cursor] + 1) % 36 : ycursors[cursor];
+
+    // ALL CURSORS (SLOTS) INITIAL DRAWING /////////////////////////////////////
+
+    for (int i = 0; i < 3; i++)
     {
-        char1 = ycursor;
         int count = 0;
         for (int l = 0; l < 5; l++) // for each row in specified letter/number
         {
             for (int k = 0; k < 3; k++) // for each column in specified letter/number
             {
-                if (letters[ycursor][count] == 1)              // l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
-                    display_set_pixel(6 + l, 20 + k, 1, 1, 1); // white pixel
+                if (letters[ycursors[i]][count] == 1)                    // l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
+                    display_set_pixel(20 + l, 6 * (i + 1) + k, 1, 1, 1); // white pixel
                 else
-                    display_set_pixel(6 + l, 20 + k, 0, 0, 0); // black pixel
+                    display_set_pixel(20 + l, 6 * (i + 1) + k, 0, 0, 0); // black pixel
+                count++;
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////
+
+    if (cursor == 0)
+    {
+        char1 = ycursors[cursor];
+        int count = 0;
+        for (int l = 0; l < 5; l++) // for each row in specified letter/number
+        {
+            for (int k = 0; k < 3; k++) // for each column in specified letter/number
+            {
+                if (letters[ycursors[cursor]][count] == 1)     // l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
+                    display_set_pixel(20 + l, 6 + k, 1, 1, 1); // white pixel
+                else
+                    display_set_pixel(20 + l, 6 + k, 0, 0, 0); // black pixel
                 count++;
             }
         }
@@ -680,7 +719,7 @@ uint32_t death_screen_display(int x, int y)
         for (int i = 19; i <= 25; i++)
         {
             display_set_pixel(i, 5, 1, 0, 0);
-            display_set_pixel(i, 5, 1, 0, 0);
+            display_set_pixel(i, 9, 1, 0, 0);
         }
 
         display_refresh();
@@ -698,84 +737,91 @@ uint32_t death_screen_display(int x, int y)
     }
     else if (cursor == 1)
     {
-        char2 = ycursor;
+        char2 = ycursors[cursor];
         int count = 0;
-        for (int k = 0; k < 5; k++) // for each row in specified letter/number
+        for (int l = 0; l < 5; l++) // for each row in specified letter/number
         {
-            for (int l = 0; l < 3; l++) // for each column in specified letter/number
+            for (int k = 0; k < 3; k++) // for each column in specified letter/number
             {
-                if (letters[ycursor][count] == 1)               // l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
-                    display_set_pixel(12 + l, 20 + k, 1, 1, 1); // white pixel
+                if (letters[ycursors[cursor]][count] == 1)      // l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
+                    display_set_pixel(20 + l, 12 + k, 1, 1, 1); // white pixel
                 else
-                    display_set_pixel(12 + l, 20 + k, 0, 0, 0); // black pixel
+                    display_set_pixel(20 + l, 12 + k, 0, 0, 0); // black pixel
                 count++;
             }
         }
         for (int i = 11; i <= 15; i++)
         {
-            display_set_pixel(i, 19, 1, 0, 0); // draw red line next to Start Game
-            display_set_pixel(i, 25, 1, 0, 0);
+            display_set_pixel(19, i, 1, 0, 0); // draw red line next to Start Game
+            display_set_pixel(25, i, 1, 0, 0);
         }
         for (int i = 19; i <= 25; i++)
         {
-            display_set_pixel(15, i, 1, 0, 0);
-            display_set_pixel(11, i, 1, 0, 0);
+            display_set_pixel(i, 15, 1, 0, 0);
+            display_set_pixel(i, 11, 1, 0, 0);
         }
 
         display_refresh();
         // wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for (int i = 11; i <= 15; i++)
         {
-            display_set_pixel(i, 19, 0, 0, 0); // draw red line next to Start Game
-            display_set_pixel(i, 25, 0, 0, 0);
+            display_set_pixel(19, i, 0, 0, 0); // draw red line next to Start Game
+            display_set_pixel(25, i, 0, 0, 0);
         }
         for (int i = 19; i <= 25; i++)
         {
-            display_set_pixel(15, i, 0, 0, 0);
-            display_set_pixel(11, i, 0, 0, 0);
+            display_set_pixel(i, 15, 0, 0, 0);
+            display_set_pixel(i, 11, 0, 0, 0);
         }
     }
     else
     {
-        char3 = ycursor;
+        char3 = ycursors[cursor];
         int count = 0;
-        for (int k = 0; k < 5; k++) // for each row in specified letter/number
+        for (int l = 0; l < 5; l++) // for each row in specified letter/number
         {
-            for (int l = 0; l < 3; l++) // for each column in specified letter/number
+            for (int k = 0; k < 3; k++) // for each column in specified letter/number
             {
-                if (letters[ycursor][count] == 1)               // l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
-                    display_set_pixel(18 + l, 20 + k, 1, 1, 1); // white pixel
+                if (letters[ycursors[cursor]][count] == 1)      // l_deco corresponds to the spesific letter/number and count is the pixel to turn on/off
+                    display_set_pixel(20 + l, 18 + k, 1, 1, 1); // white pixel
                 else
-                    display_set_pixel(18 + l, 20 + k, 0, 0, 0); // black pixel
+                    display_set_pixel(20 + l, 18 + k, 0, 0, 0); // black pixel
                 count++;
             }
         }
         for (int i = 17; i <= 21; i++)
         {
-            display_set_pixel(i, 19, 1, 0, 0); // draw red line next to Start Game
-            display_set_pixel(i, 25, 1, 0, 0);
+            display_set_pixel(19, i, 1, 0, 0); // draw red line next to Start Game
+            display_set_pixel(25, i, 1, 0, 0);
         }
         for (int i = 19; i <= 25; i++)
         {
-            display_set_pixel(17, i, 1, 0, 0);
-            display_set_pixel(21, i, 1, 0, 0);
+            display_set_pixel(i, 17, 1, 0, 0);
+            display_set_pixel(i, 21, 1, 0, 0);
         }
 
         display_refresh();
         // wait_ms(50); //flashing red border I ned to figure out how long this needs to propagate
         for (int i = 17; i <= 21; i++)
         {
-            display_set_pixel(i, 19, 0, 0, 0); // draw red line next to Start Game
-            display_set_pixel(i, 25, 0, 0, 0);
+            display_set_pixel(19, i, 0, 0, 0); // draw red line next to Start Game
+            display_set_pixel(25, i, 0, 0, 0);
         }
         for (int i = 19; i <= 25; i++)
         {
-            display_set_pixel(17, i, 0, 0, 0);
-            display_set_pixel(21, i, 0, 0, 0);
+            display_set_pixel(i, 17, 0, 0, 0);
+            display_set_pixel(i, 21, 0, 0, 0);
         }
     }
 
-    return (char1 << 31) | (char2 << 26) || (char3 << 21) || ((uint32_t)score);
+    hs_entry_t *hs_entry = malloc(sizeof(hs_entry));
+    hs_entry->name[0] = char1;
+    hs_entry->name[1] = char2;
+    hs_entry->name[2] = char3;
+    hs_entry->score = score;
+
+    printf("HS ENTRY: %d%d%d %d\n", char1, char2, char3, score);
+    return hs_entry;
 }
 
 // pin constants

@@ -8,6 +8,7 @@
 #include "joystick.h"
 #include "display.h"
 #include "highscore.h"
+#include <time.h>
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -93,14 +94,44 @@ int main()
     int game_timer = 0;
     // int prev_screen_state = 0;
     display_init();
-    // init_pwm_audio();
-    // highscores_init_defaults(); //not yet included | does nto work
+    init_pwm_audio();
+    //highscores_init_defaults(); //not yet included | does nto work
     button_init();
     snake *head = NULL;
     bool dead = false;
     uint8_t startgame = 0; // 0 not started, 1 just started, 2 in progress, 3 dead | I should actually make a new state but im lazy
-
+    hs_entry_t *hs_entry;
+    highscore_eeprom_t hsstruct = {.i2c_addr = I2C_ADDR_DEFAULT, .i2c_port = i2c0};
+    hs_entry_t *scores;
+    scores = malloc(4 * sizeof(hs_entry_t));
+    eeprom_init(i2c0, I2C_ADDR_DEFAULT, &hsstruct);
+    bool hs_entered = false;
+    bool hs_loaded = false;
+    srand(time(NULL));
     // sleep_ms(1000);
+
+    //WIPE EEPROM TEST////////////////////////////////////
+    hs_entry_t wipe_out[4] = 
+    {
+        {
+            .name = 0,
+            .score = 0
+        },
+        {
+            .name = 0,
+            .score = 0
+        },{
+            .name = 0,
+            .score = 0
+        },{
+            .name = 0,
+            .score = 0
+        }
+    };
+
+    highscores_save(&hsstruct, &wipe_out);
+    //////////////////////////////////////////////////////
+    
     while (1)
     {
         joystick_read(&x, &y, &v);
@@ -131,6 +162,9 @@ int main()
                 printf("Start Game\n");
                 head = init_snake_game();
                 startgame += 1; // move to in progress
+                dead = false;
+                hs_entered = false;
+                hs_loaded = false;
             }
             game_timer += 1;
             if (game_timer >= COUNTER_TOP)
@@ -156,11 +190,56 @@ int main()
                         kill_snake(head); // free snake memory
                         startgame += 1;   // move to dead state
                     }
-                    uint32_t runscore = death_screen_display(xdir, ydir); // function that displays score and if high score
-                    if (button_pressed)
+
+                    if (!hs_entered)
+                    {
+                        hs_entry = death_screen_display(xdir, ydir); // function that displays score and if high score
+                    }
+
+                    if (button_pressed && !hs_entered)
                     {
                         // compare highscore in here and then store here if highscore is to be determined here
-                        display_clear();
+
+                        int success = highscores_load(&hsstruct, scores);
+
+                        if (success == -1) // invalid read from eeprom
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                scores[i].name[0] = 'A';
+                                scores[i].name[1] = 'A';
+                                scores[i].name[2] = 'A';
+                                scores[i].score = 0;
+                            }
+                        }
+
+                        int position = 4;
+                        while (hs_entry->score > scores[position-1])
+
+                        //compare first
+                        if (hs_entry->score > scores[3].score)
+                        {
+                            scores[3].name[0] = hs_entry->name[0];
+                            scores[3].name[1] = hs_entry->name[1];
+                            scores[3].name[2] = hs_entry->name[2];
+                            scores[3].score = hs_entry->score;
+                        }
+
+                        //move the rest up
+                        for (int i = 3; i > 0; i--)
+                        {
+                            if (scores[i].score > scores[i-1].score)
+                            {
+                                scores[i-1].name[0] = scores[i].name[0];
+                                scores[i-1].name[1] = scores[i].name[1];
+                                scores[i-1].name[2] = scores[i].name[2];
+                                scores[i-1].score = scores[i].score;
+                            }
+                        }
+
+                        highscores_save(&hsstruct, scores);
+                        hs_entered = true;
+
                         screen_state = 2;
                     }
                 }
@@ -177,14 +256,20 @@ int main()
                 // loop_until_button_switch(button_pressed);
                 display_clear();
                 screen_state = 0;
+                dead = false;
+                hs_entered = false;
+                hs_loaded = false;
             }
             else
             {
-                highscore_display();
+                display_clear();
+                highscore_display(&hsstruct, scores, &hs_loaded);
             }
         }
         display_refresh();
     }
+
+    free(scores);
 }
 /*
 

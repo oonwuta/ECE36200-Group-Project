@@ -11,6 +11,9 @@
 #define EEPROM_BLOCK_SIZE 4096 //4 KB
 #define EEPROM_WRITE_MS 5
 
+#define SDA_PIN 4
+#define SCL_PIN 5
+
 //highscore layout
 #define HS_COUNT 4 //top 4 scores
 #define HS_ENTRY_BYTES 7 //3 bytes name + 4 bytes score = 7

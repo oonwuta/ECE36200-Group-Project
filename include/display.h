@@ -1,6 +1,7 @@
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 #include "pico/multicore.h"
+#include "highscore.h"
 #include <string.h>
 #include <stdbool.h>
 
@@ -20,10 +21,10 @@ typedef struct _grid{
     struct _snake *snake_segment;
 } Grid;
 
-uint32_t death_screen_display(int x, int y); 
+hs_entry_t *death_screen_display(int x, int y); 
 snake *init_snake_game(void);
 int start_display(int y);
 bool game_loop(int xdir, int ydir, snake *head);
-void highscore_display(); //int prev_screen_state
+void highscore_display(highscore_eeprom_t *e, hs_entry_t *scores, bool *hs_loaded); //int prev_screen_state
 void game_loop_update_screen_contents();
 
