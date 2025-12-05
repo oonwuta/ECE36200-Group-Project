@@ -19,7 +19,7 @@ bool button_state = false;
 #define joysticYadc 0 //adc channel for other pin
 #define OVERSAMPLE 64 
 
-bool button_mem[8] = {false,false,false,false,false,false,false,false};
+bool button_mem[8] = {true, true, true, true, true, true, true, true}; // for button debouncing
 
 uint16_t x_buffer[OVERSAMPLE];
 uint16_t y_buffer[OVERSAMPLE];
@@ -169,6 +169,10 @@ bool button_read(){
         button_mem[i] = button_mem[i-1];
     }
     button_mem[0] = gpio_get(joystickbutton); //active low
-
-    return (read == false && button_mem[0] == false);
+    bool retval = (read == false && button_mem[0] == false);
+    if(button_mem[0] ==  true){
+        for(int i = 7; i >= 0; i--)
+            button_mem[i] = true;
+    }
+    return retval;
 }
